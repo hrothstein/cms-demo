@@ -17,6 +17,8 @@ import SettingsPage from './pages/SettingsPage'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminCustomersPage from './pages/admin/AdminCustomersPage'
+import AdminCardsPage from './pages/admin/AdminCardsPage'
+import AdminTransactionsPage from './pages/admin/AdminTransactionsPage'
 
 // Components
 import Layout from './components/Layout'
@@ -77,8 +79,8 @@ function App() {
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="customers" element={<AdminCustomersPage />} />
-            <Route path="cards" element={<div className="p-6"><h1 className="text-2xl font-bold">Cards Management</h1><p className="text-gray-600">Coming soon...</p></div>} />
-            <Route path="transactions" element={<div className="p-6"><h1 className="text-2xl font-bold">Transactions</h1><p className="text-gray-600">Coming soon...</p></div>} />
+            <Route path="cards" element={<AdminCardsPage />} />
+            <Route path="transactions" element={<AdminTransactionsPage />} />
             <Route path="disputes" element={<div className="p-6"><h1 className="text-2xl font-bold">Disputes</h1><p className="text-gray-600">Coming soon...</p></div>} />
             <Route path="alerts" element={<div className="p-6"><h1 className="text-2xl font-bold">Alerts</h1><p className="text-gray-600">Coming soon...</p></div>} />
             <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Reports</h1><p className="text-gray-600">Coming soon...</p></div>} />
