@@ -28,7 +28,7 @@ heroku create $APP_NAME
 
 # Add PostgreSQL addon
 echo "🗄️ Adding PostgreSQL addon..."
-heroku addons:create heroku-postgresql:mini -a $APP_NAME
+heroku addons:create heroku-postgresql:essential-0 -a $APP_NAME
 
 # Set environment variables
 echo "⚙️ Setting environment variables..."

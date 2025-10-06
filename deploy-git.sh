@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Two Heroku Apps Deployment Script
-# Deploys backend and frontend to separate Heroku apps
+# Git-based Heroku deployment script
+# Deploys backend and frontend using Git deployment (no Docker required)
 
 set -e
 
-echo "🚀 Deploying Card Management System to TWO Heroku Apps..."
+echo "🚀 Deploying Card Management System using Git deployment..."
 
 # Check if Heroku CLI is installed
 if ! command -v heroku &> /dev/null; then
@@ -34,12 +34,9 @@ heroku config:set JWT_EXPIRES_IN=1h -a $BACKEND_APP_NAME
 heroku config:set ENCRYPTION_KEY=$(openssl rand -base64 32) -a $BACKEND_APP_NAME
 heroku config:set ALLOWED_ORIGINS="*" -a $BACKEND_APP_NAME
 
-# Login to Heroku Container Registry
-heroku container:login
-
-# Build and push backend container
-heroku container:push web -a $BACKEND_APP_NAME
-heroku container:release web -a $BACKEND_APP_NAME
+# Deploy backend using Git
+echo "🚀 Deploying backend code..."
+git subtree push --prefix=. heroku main
 
 # Get backend URL
 BACKEND_URL=$(heroku apps:info -a $BACKEND_APP_NAME --json | jq -r '.app.web_url')
