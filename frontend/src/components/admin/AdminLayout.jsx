@@ -1,4 +1,5 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAdmin } from '../../contexts/AdminContext';
 import AdminNav from './AdminNav';
 import LoadingSpinner from '../LoadingSpinner';
@@ -16,8 +17,13 @@ const AdminLayout = () => {
     );
   }
 
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading) {
+      navigate('/admin/login');
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
   if (!isAuthenticated) {
-    navigate('/admin/login');
     return null;
   }
 

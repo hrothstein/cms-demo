@@ -85,7 +85,8 @@ export function AdminProvider({ children }) {
             dispatch({ type: 'LOGOUT' });
           }
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log('Token validation failed:', error.message);
           // Token is invalid, remove it
           localStorage.removeItem('adminToken');
           dispatch({ type: 'LOGOUT' });
@@ -149,6 +150,11 @@ export function AdminProvider({ children }) {
     dispatch({ type: 'CLEAR_ERROR' });
   };
 
+  const clearInvalidToken = () => {
+    localStorage.removeItem('adminToken');
+    dispatch({ type: 'LOGOUT' });
+  };
+
   const value = {
     ...state,
     login,
@@ -156,7 +162,8 @@ export function AdminProvider({ children }) {
     hasPermission,
     hasRole,
     hasAnyRole,
-    clearError
+    clearError,
+    clearInvalidToken
   };
 
   return (

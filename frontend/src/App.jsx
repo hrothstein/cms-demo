@@ -77,7 +77,12 @@ function App() {
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="customers" element={<AdminCustomersPage />} />
-            {/* More admin routes will be added here */}
+            <Route path="cards" element={<div className="p-6"><h1 className="text-2xl font-bold">Cards Management</h1><p className="text-gray-600">Coming soon...</p></div>} />
+            <Route path="transactions" element={<div className="p-6"><h1 className="text-2xl font-bold">Transactions</h1><p className="text-gray-600">Coming soon...</p></div>} />
+            <Route path="disputes" element={<div className="p-6"><h1 className="text-2xl font-bold">Disputes</h1><p className="text-gray-600">Coming soon...</p></div>} />
+            <Route path="alerts" element={<div className="p-6"><h1 className="text-2xl font-bold">Alerts</h1><p className="text-gray-600">Coming soon...</p></div>} />
+            <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Reports</h1><p className="text-gray-600">Coming soon...</p></div>} />
+            <Route path="audit-logs" element={<div className="p-6"><h1 className="text-2xl font-bold">Audit Logs</h1><p className="text-gray-600">Coming soon...</p></div>} />
           </Route>
         </Routes>
       </div>
