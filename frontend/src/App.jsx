@@ -16,6 +16,7 @@ import SettingsPage from './pages/SettingsPage'
 // Admin Pages
 import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
+import AdminCustomersPage from './pages/admin/AdminCustomersPage'
 
 // Components
 import Layout from './components/Layout'
@@ -75,6 +76,7 @@ function App() {
           >
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="customers" element={<AdminCustomersPage />} />
             {/* More admin routes will be added here */}
           </Route>
         </Routes>
