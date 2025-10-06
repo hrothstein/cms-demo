@@ -12,7 +12,12 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Handle all routes - serve index.html for client-side routing
+// But exclude API routes
 app.use((req, res) => {
+  // Don't serve React app for API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API not found on frontend server' });
+  }
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
