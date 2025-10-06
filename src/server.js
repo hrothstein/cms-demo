@@ -19,8 +19,14 @@ const customerRoutes = require('./routes/customers');
 const fraudRoutes = require('./routes/fraud');
 const notificationRoutes = require('./routes/notifications');
 
+// Import admin routes
+const adminAuthRoutes = require('./routes/admin/auth');
+const adminCustomerRoutes = require('./routes/admin/customers');
+const adminCardRoutes = require('./routes/admin/cards');
+
 // Import middleware
 const authMiddleware = require('./middleware/auth');
+const adminAuthMiddleware = require('./middleware/adminAuth');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -113,6 +119,11 @@ app.use('/api/v1/transactions', authMiddleware, transactionRoutes);
 app.use('/api/v1/customers', authMiddleware, customerRoutes);
 app.use('/api/v1/fraud', authMiddleware, fraudRoutes);
 app.use('/api/v1/notifications', authMiddleware, notificationRoutes);
+
+// Admin API routes
+app.use('/api/v1/admin/auth', adminAuthRoutes);
+app.use('/api/v1/admin/customers', adminAuthMiddleware, adminCustomerRoutes);
+app.use('/api/v1/admin/cards', adminAuthMiddleware, adminCardRoutes);
 
 // Authentication endpoint
 app.post('/api/v1/auth/login', async (req, res) => {
