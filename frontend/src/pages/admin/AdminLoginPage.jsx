@@ -34,7 +34,7 @@ const AdminLoginPage = () => {
     setError('');
 
     try {
-      const result = await login(formData.username, formData.password);
+      const result = await login(formData);
       
       if (result.success) {
         navigate('/admin/dashboard');
