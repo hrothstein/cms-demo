@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const YAML = require('yamljs');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -104,6 +105,10 @@ const swaggerOptions = {
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Admin API documentation
+const adminApiSpec = YAML.load('./src/swagger/admin-api.yaml');
+app.use('/admin-api-docs', swaggerUi.serve, swaggerUi.setup(adminApiSpec));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
