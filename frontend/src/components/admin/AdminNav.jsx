@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { useAdmin } from '../../context/AdminContext';
+import { useAdmin } from '../../contexts/AdminContext';
 
 const AdminNav = ({ onLogout }) => {
   const { admin, hasPermission } = useAdmin();

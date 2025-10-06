@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAdmin } from '../../context/AdminContext';
+import { useAdmin } from '../../contexts/AdminContext';
 import AdminNav from './AdminNav';
 import LoadingSpinner from '../LoadingSpinner';
 

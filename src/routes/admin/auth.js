@@ -42,9 +42,8 @@ router.post('/login', auditLogs.adminLogin, async (req, res) => {
 
     const admin = result.rows[0];
     
-    // For demo purposes, check if password is 'admin123'
-    // In production, use: const isValidPassword = await bcrypt.compare(password, admin.password_hash);
-    const isValidPassword = password === 'admin123';
+    // Check password using bcrypt
+    const isValidPassword = await bcrypt.compare(password, admin.password_hash);
     
     if (!isValidPassword) {
       return res.status(401).json({

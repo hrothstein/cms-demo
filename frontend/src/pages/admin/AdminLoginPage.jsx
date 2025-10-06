@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdmin } from '../../context/AdminContext';
+import { useAdmin } from '../../contexts/AdminContext';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 const AdminLoginPage = () => {

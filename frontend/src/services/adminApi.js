@@ -2,14 +2,14 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/
 
 class AdminApiService {
   constructor() {
-    this.baseURL = `${API_BASE_URL}/admin`;
+    this.baseURL = API_BASE_URL;
   }
 
   getAuthHeaders() {
     const token = localStorage.getItem('adminToken');
     return {
       'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
+      ...(token && { 'Authorization': `Bearer ${token}` })
     };
   }
 
@@ -25,70 +25,79 @@ class AdminApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error?.message || 'Request failed');
+        throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
       }
 
       return data;
     } catch (error) {
-      console.error('Admin API request failed:', error);
+      console.error('API request failed:', error);
       throw error;
     }
   }
 
   // Authentication
-  async login(username, password) {
-    return this.request('/auth/login', {
+  async login(credentials) {
+    return this.request('/admin/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ username, password })
-    });
-  }
-
-  async logout() {
-    return this.request('/auth/logout', {
-      method: 'POST'
+      body: JSON.stringify(credentials)
     });
   }
 
   async getProfile() {
-    return this.request('/auth/profile');
+    return this.request('/admin/auth/profile');
+  }
+
+  async logout() {
+    return this.request('/admin/auth/logout', {
+      method: 'POST'
+    });
   }
 
   // Customers
   async getCustomers(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/customers${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/admin/customers?${queryString}`);
   }
 
   async getCustomer(customerId) {
-    return this.request(`/customers/${customerId}`);
+    return this.request(`/admin/customers/${customerId}`);
+  }
+
+  async getCustomerCards(customerId) {
+    return this.request(`/admin/customers/${customerId}/cards`);
+  }
+
+  async getCustomerTransactions(customerId, params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/admin/customers/${customerId}/transactions?${queryString}`);
   }
 
   // Cards
   async getCards(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/cards${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/admin/cards?${queryString}`);
   }
 
   async getCard(cardId) {
-    return this.request(`/cards/${cardId}`);
+    return this.request(`/admin/cards/${cardId}`);
   }
 
-  async lockCard(cardId, reason, notes) {
-    return this.request(`/cards/${cardId}/lock`, {
+  async lockCard(cardId, reason) {
+    return this.request(`/admin/cards/${cardId}/lock`, {
       method: 'POST',
-      body: JSON.stringify({ reason, notes })
+      body: JSON.stringify({ reason })
     });
   }
 
-  async unlockCard(cardId, notes) {
-    return this.request(`/cards/${cardId}/unlock`, {
+  async unlockCard(cardId, reason) {
+    return this.request(`/admin/cards/${cardId}/unlock`, {
       method: 'POST',
-      body: JSON.stringify({ notes })
+      body: JSON.stringify({ reason })
     });
   }
 
   async updateCardControls(cardId, controls) {
-    return this.request(`/cards/${cardId}/controls`, {
+    return this.request(`/admin/cards/${cardId}/controls`, {
       method: 'PUT',
       body: JSON.stringify(controls)
     });
@@ -97,117 +106,100 @@ class AdminApiService {
   // Transactions
   async getTransactions(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/transactions${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/admin/transactions?${queryString}`);
   }
 
   async getTransaction(transactionId) {
-    return this.request(`/transactions/${transactionId}`);
-  }
-
-  async flagTransaction(transactionId, reason, notes) {
-    return this.request(`/transactions/${transactionId}/flag`, {
-      method: 'POST',
-      body: JSON.stringify({ reason, notes })
-    });
+    return this.request(`/admin/transactions/${transactionId}`);
   }
 
   // Disputes
   async getDisputes(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/disputes${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/admin/disputes?${queryString}`);
   }
 
   async getDispute(disputeId) {
-    return this.request(`/disputes/${disputeId}`);
+    return this.request(`/admin/disputes/${disputeId}`);
   }
 
   async updateDispute(disputeId, updates) {
-    return this.request(`/disputes/${disputeId}`, {
+    return this.request(`/admin/disputes/${disputeId}`, {
       method: 'PUT',
       body: JSON.stringify(updates)
     });
   }
 
-  async assignDispute(disputeId, assignedTo) {
-    return this.request(`/disputes/${disputeId}/assign`, {
+  async assignDispute(disputeId, adminId) {
+    return this.request(`/admin/disputes/${disputeId}/assign`, {
       method: 'POST',
-      body: JSON.stringify({ assignedTo })
+      body: JSON.stringify({ adminId })
     });
   }
 
   // Alerts
   async getAlerts(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/alerts${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/admin/alerts?${queryString}`);
   }
 
   async getAlert(alertId) {
-    return this.request(`/alerts/${alertId}`);
+    return this.request(`/admin/alerts/${alertId}`);
   }
 
-  async reviewAlert(alertId, reviewNotes, actionTaken, dismiss = false) {
-    return this.request(`/alerts/${alertId}/review`, {
-      method: 'PUT',
-      body: JSON.stringify({ reviewNotes, actionTaken, dismiss })
-    });
-  }
-
-  async dismissAlert(alertId, reason, notes) {
-    return this.request(`/alerts/${alertId}/dismiss`, {
+  async dismissAlert(alertId, reason) {
+    return this.request(`/admin/alerts/${alertId}/dismiss`, {
       method: 'POST',
-      body: JSON.stringify({ reason, notes })
+      body: JSON.stringify({ reason })
     });
   }
 
   // Reports
   async getDashboardStats() {
-    return this.request('/reports/dashboard');
+    return this.request('/admin/reports/dashboard');
   }
 
-  async generateReport(reportData) {
-    return this.request('/reports/generate', {
-      method: 'POST',
-      body: JSON.stringify(reportData)
-    });
+  async getTransactionReport(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/admin/reports/transactions?${queryString}`);
+  }
+
+  async getFraudReport(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/admin/reports/fraud?${queryString}`);
   }
 
   // Audit Logs
   async getAuditLogs(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/audit-logs${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getAuditLog(logId) {
-    return this.request(`/audit-logs/${logId}`);
-  }
-
-  async getAuditLogStats(startDate, endDate) {
-    const queryString = new URLSearchParams({ startDate, endDate }).toString();
-    return this.request(`/audit-logs/stats/summary?${queryString}`);
+    return this.request(`/admin/audit-logs?${queryString}`);
   }
 
   // Notes
-  async getNotes(referenceType, referenceId, params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    return this.request(`/notes/${referenceType}/${referenceId}${queryString ? `?${queryString}` : ''}`);
+  async getNotes(noteType, referenceId) {
+    return this.request(`/admin/notes/${noteType}/${referenceId}`);
   }
 
-  async addNote(noteData) {
-    return this.request('/notes', {
+  async addNote(noteType, referenceId, noteData) {
+    return this.request('/admin/notes', {
       method: 'POST',
-      body: JSON.stringify(noteData)
+      body: JSON.stringify({
+        noteType,
+        referenceId,
+        ...noteData
+      })
     });
   }
 
-  async updateNote(noteId, noteData) {
-    return this.request(`/notes/${noteId}`, {
+  async updateNote(noteId, updates) {
+    return this.request(`/admin/notes/${noteId}`, {
       method: 'PUT',
-      body: JSON.stringify(noteData)
+      body: JSON.stringify(updates)
     });
   }
 
   async deleteNote(noteId) {
-    return this.request(`/notes/${noteId}`, {
+    return this.request(`/admin/notes/${noteId}`, {
       method: 'DELETE'
     });
   }
