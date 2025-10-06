@@ -23,6 +23,12 @@ const notificationRoutes = require('./routes/notifications');
 const adminAuthRoutes = require('./routes/admin/auth');
 const adminCustomerRoutes = require('./routes/admin/customers');
 const adminCardRoutes = require('./routes/admin/cards');
+const adminTransactionRoutes = require('./routes/admin/transactions');
+const adminDisputeRoutes = require('./routes/admin/disputes');
+const adminAlertRoutes = require('./routes/admin/alerts');
+const adminReportRoutes = require('./routes/admin/reports');
+const adminAuditLogRoutes = require('./routes/admin/auditLogs');
+const adminNoteRoutes = require('./routes/admin/notes');
 
 // Import middleware
 const authMiddleware = require('./middleware/auth');
@@ -124,6 +130,12 @@ app.use('/api/v1/notifications', authMiddleware, notificationRoutes);
 app.use('/api/v1/admin/auth', adminAuthRoutes);
 app.use('/api/v1/admin/customers', adminAuthMiddleware, adminCustomerRoutes);
 app.use('/api/v1/admin/cards', adminAuthMiddleware, adminCardRoutes);
+app.use('/api/v1/admin/transactions', adminAuthMiddleware, adminTransactionRoutes);
+app.use('/api/v1/admin/disputes', adminAuthMiddleware, adminDisputeRoutes);
+app.use('/api/v1/admin/alerts', adminAuthMiddleware, adminAlertRoutes);
+app.use('/api/v1/admin/reports', adminAuthMiddleware, adminReportRoutes);
+app.use('/api/v1/admin/audit-logs', adminAuthMiddleware, adminAuditLogRoutes);
+app.use('/api/v1/admin/notes', adminAuthMiddleware, adminNoteRoutes);
 
 // Authentication endpoint
 app.post('/api/v1/auth/login', async (req, res) => {
