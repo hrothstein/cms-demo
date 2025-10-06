@@ -29,13 +29,15 @@ const PORT = process.env.PORT || 3000;
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+  origin: [
     'http://localhost:3000', 
     'http://localhost:8080', 
     'http://localhost:5173',
     'https://cms-frontend-1759769376-89e39b75295e.herokuapp.com'
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
 }));
 
 // Rate limiting
