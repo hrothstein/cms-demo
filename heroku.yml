@@ -1,0 +1,7 @@
+build:
+  docker:
+    web: Dockerfile.backend
+    worker: Dockerfile.frontend
+run:
+  web: node src/server.js
+  worker: npm run start
