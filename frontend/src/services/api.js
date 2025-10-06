@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Create axios instance
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://cms-backend-1759769281-c3f75c1b055e.herokuapp.com/api/v1' : '/api/v1'),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
