@@ -5,7 +5,10 @@ const fs = require('fs');
 const path = require('path');
 
 // Database configuration
-const dbConfig = {
+const dbConfig = process.env.DATABASE_URL ? {
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+} : {
   user: process.env.DB_USER || 'cms_user',
   host: process.env.DB_HOST || 'localhost',
   database: process.env.DB_NAME || 'cms_db',
