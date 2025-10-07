@@ -1,1 +1,1 @@
-web: node backend-server.js
+web: cd frontend && npm install && npm run build && npx serve -s dist -l $PORT
