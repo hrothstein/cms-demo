@@ -1,1 +1,1 @@
-web: cd frontend && npm install && npx vite build && npx serve -s dist -l 3000
+web: cd frontend && npm run build && npx serve -s dist -l 3000
