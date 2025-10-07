@@ -29,6 +29,7 @@ const adminDisputeRoutes = require('./src/routes/admin/disputes');
 const adminAlertRoutes = require('./src/routes/admin/alerts');
 const adminReportRoutes = require('./src/routes/admin/reports-simple');
 const adminAuditLogRoutes = require('./src/routes/admin/auditLogs-simple');
+const adminHbrSyncRoutes = require('./src/routes/admin/hbr-sync');
 const adminNoteRoutes = require('./src/routes/admin/notes');
 
 // Import middleware
@@ -141,6 +142,7 @@ app.use('/api/v1/admin/alerts', adminAuthMiddleware, adminAlertRoutes);
 app.use('/api/v1/admin/reports', adminAuthMiddleware, adminReportRoutes);
 app.use('/api/v1/admin/audit-logs', adminAuthMiddleware, adminAuditLogRoutes);
 app.use('/api/v1/admin/notes', adminAuthMiddleware, adminNoteRoutes);
+app.use('/api/v1/admin/hbr-sync', adminAuthMiddleware, adminHbrSyncRoutes);
 
 // Authentication endpoint
 app.post('/api/v1/auth/login', async (req, res) => {
