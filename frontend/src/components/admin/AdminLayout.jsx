@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAdmin } from '../../contexts/AdminContext';
 import AdminNav from './AdminNav';
 import LoadingSpinner from '../LoadingSpinner';
@@ -8,6 +8,7 @@ const AdminLayout = () => {
   const { isAuthenticated, isLoading, logout } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
+  const hasNavigated = useRef(false);
 
   if (isLoading) {
     return (
@@ -18,7 +19,8 @@ const AdminLayout = () => {
   }
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    if (!isAuthenticated && !isLoading && !hasNavigated.current) {
+      hasNavigated.current = true;
       navigate('/admin/login');
     }
   }, [isAuthenticated, isLoading]);
