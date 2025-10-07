@@ -40,8 +40,8 @@ const AdminCardsPage = () => {
 
       const response = await adminApi.getCards(params);
       if (response.success) {
-        setCards(response.data);
-        setPagination(response.pagination);
+        setCards(response.data.cards || []);
+        setPagination(response.data.pagination || { total: 0, limit: 20, offset: 0, pages: 1 });
       } else {
         setError(response.error?.message || 'Failed to fetch cards');
       }
@@ -227,7 +227,7 @@ const AdminCardsPage = () => {
       {/* Cards Table */}
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
         <ul className="divide-y divide-gray-200">
-          {cards.length === 0 ? (
+          {!cards || cards.length === 0 ? (
             <li className="px-6 py-4 text-center text-gray-500">
               No cards found matching your criteria
             </li>
