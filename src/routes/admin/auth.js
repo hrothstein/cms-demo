@@ -120,31 +120,6 @@ router.post('/logout', (req, res) => {
   });
 });
 
-// Get current admin profile
-router.get('/profile', (req, res) => {
-  if (!req.admin) {
-    return res.status(401).json({
-      success: false,
-      error: {
-        code: 'UNAUTHORIZED',
-        message: 'Admin authentication required'
-      }
-    });
-  }
-
-  res.json({
-    success: true,
-    data: {
-      adminId: req.admin.adminId,
-      username: req.admin.username,
-      firstName: req.admin.firstName,
-      lastName: req.admin.lastName,
-      role: req.admin.role,
-      department: req.admin.department
-    }
-  });
-});
-
 // Admin profile endpoint
 router.get('/profile', async (req, res) => {
   try {
