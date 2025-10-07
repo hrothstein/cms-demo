@@ -23,7 +23,7 @@ router.post('/login', auditLogs.adminLogin, async (req, res) => {
 
     // Query admin user from database
     const adminQuery = `
-      SELECT admin_id, username, password_hash, email, first_name, last_name, role, department, is_active
+      SELECT id as admin_id, username, password_hash, email, first_name, last_name, role, department, is_active
       FROM admin_users 
       WHERE username = $1 AND is_active = true
     `;
