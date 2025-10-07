@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const YAML = require('yamljs');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -19,8 +20,20 @@ const customerRoutes = require('./routes/customers');
 const fraudRoutes = require('./routes/fraud');
 const notificationRoutes = require('./routes/notifications');
 
+// Import admin routes
+const adminAuthRoutes = require('./routes/admin/auth');
+const adminCustomerRoutes = require('./routes/admin/customers');
+const adminCardRoutes = require('./routes/admin/cards');
+const adminTransactionRoutes = require('./routes/admin/transactions');
+const adminDisputeRoutes = require('./routes/admin/disputes');
+const adminAlertRoutes = require('./routes/admin/alerts');
+const adminReportRoutes = require('./routes/admin/reports');
+const adminAuditLogRoutes = require('./routes/admin/auditLogs');
+const adminNoteRoutes = require('./routes/admin/notes');
+
 // Import middleware
 const authMiddleware = require('./middleware/auth');
+const adminAuthMiddleware = require('./middleware/adminAuth');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -29,8 +42,15 @@ const PORT = process.env.PORT || 3000;
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:5173'],
-  credentials: true
+  origin: [
+    'http://localhost:3000', 
+    'http://localhost:8080', 
+    'http://localhost:5173',
+    'https://cms-frontend-1759769376-89e39b75295e.herokuapp.com'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
 }));
 
 // Rate limiting
@@ -86,6 +106,10 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Admin API documentation
+const adminApiSpec = YAML.load('./src/swagger/admin-api.yaml');
+app.use('/admin-api-docs', swaggerUi.serve, swaggerUi.setup(adminApiSpec));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
@@ -106,6 +130,17 @@ app.use('/api/v1/transactions', authMiddleware, transactionRoutes);
 app.use('/api/v1/customers', authMiddleware, customerRoutes);
 app.use('/api/v1/fraud', authMiddleware, fraudRoutes);
 app.use('/api/v1/notifications', authMiddleware, notificationRoutes);
+
+// Admin API routes
+app.use('/api/v1/admin/auth', adminAuthRoutes);
+app.use('/api/v1/admin/customers', adminAuthMiddleware, adminCustomerRoutes);
+app.use('/api/v1/admin/cards', adminAuthMiddleware, adminCardRoutes);
+app.use('/api/v1/admin/transactions', adminAuthMiddleware, adminTransactionRoutes);
+app.use('/api/v1/admin/disputes', adminAuthMiddleware, adminDisputeRoutes);
+app.use('/api/v1/admin/alerts', adminAuthMiddleware, adminAlertRoutes);
+app.use('/api/v1/admin/reports', adminAuthMiddleware, adminReportRoutes);
+app.use('/api/v1/admin/audit-logs', adminAuthMiddleware, adminAuditLogRoutes);
+app.use('/api/v1/admin/notes', adminAuthMiddleware, adminNoteRoutes);
 
 // Authentication endpoint
 app.post('/api/v1/auth/login', async (req, res) => {
