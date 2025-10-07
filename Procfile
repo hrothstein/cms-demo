@@ -1,1 +1,1 @@
-web: node start-frontend.js
+web: cd frontend && npm run build && npx serve -s dist -l $PORT

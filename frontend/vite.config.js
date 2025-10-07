@@ -18,5 +18,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true
+  },
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'https://cms-backend-1759769281-c3f75c1b055e.herokuapp.com/api/v1')
   }
 })
