@@ -33,9 +33,9 @@ const adminAuth = async (req, res, next) => {
 
     // Get admin user details from database
     const adminQuery = `
-      SELECT admin_id, username, email, first_name, last_name, role, department, is_active
+      SELECT id as admin_id, username, email, first_name, last_name, role, department, is_active
       FROM admin_users 
-      WHERE admin_id = $1 AND is_active = true
+      WHERE id = $1 AND is_active = true
     `;
     
     const result = await query(adminQuery, [decoded.adminId]);
