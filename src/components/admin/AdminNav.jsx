@@ -6,14 +6,14 @@ const AdminNav = ({ onLogout }) => {
   const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: '📊', permission: 'GENERATE_REPORTS' },
-    { name: 'Customers', href: '/admin/customers', icon: '👥', permission: 'VIEW_CUSTOMERS' },
-    { name: 'Cards', href: '/admin/cards', icon: '💳', permission: 'VIEW_CARDS' },
-    { name: 'Transactions', href: '/admin/transactions', icon: '💸', permission: 'VIEW_TRANSACTIONS' },
-    { name: 'Disputes', href: '/admin/disputes', icon: '⚖️', permission: 'VIEW_DISPUTES' },
-    { name: 'Alerts', href: '/admin/alerts', icon: '🚨', permission: 'VIEW_ALERTS' },
-    { name: 'Reports', href: '/admin/reports', icon: '📈', permission: 'GENERATE_REPORTS' },
-    { name: 'Audit Logs', href: '/admin/audit-logs', icon: '📋', permission: 'VIEW_AUDIT_LOGS' }
+    { name: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
+    { name: 'Customers', href: '/admin/customers', icon: '👥' },
+    { name: 'Cards', href: '/admin/cards', icon: '💳' },
+    { name: 'Transactions', href: '/admin/transactions', icon: '💸' },
+    { name: 'Disputes', href: '/admin/disputes', icon: '⚖️' },
+    { name: 'Alerts', href: '/admin/alerts', icon: '🚨' },
+    { name: 'Reports', href: '/admin/reports', icon: '📈' },
+    { name: 'Audit Logs', href: '/admin/audit-logs', icon: '📋' }
   ];
 
   const filteredNavigation = navigation.filter(item => 
