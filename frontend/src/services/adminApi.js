@@ -130,6 +130,20 @@ class AdminApiService {
     });
   }
 
+  async updateDisputeStatus(disputeId, status) {
+    return this.request(`/admin/disputes/${disputeId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    });
+  }
+
+  async addDisputeNote(disputeId, note) {
+    return this.request(`/admin/disputes/${disputeId}/notes`, {
+      method: 'POST',
+      body: JSON.stringify({ note })
+    });
+  }
+
   async assignDispute(disputeId, adminId) {
     return this.request(`/admin/disputes/${disputeId}/assign`, {
       method: 'POST',
@@ -147,6 +161,18 @@ class AdminApiService {
     return this.request(`/admin/alerts/${alertId}`);
   }
 
+  async acknowledgeAlert(alertId) {
+    return this.request(`/admin/alerts/${alertId}/acknowledge`, {
+      method: 'PUT'
+    });
+  }
+
+  async resolveAlert(alertId) {
+    return this.request(`/admin/alerts/${alertId}/resolve`, {
+      method: 'PUT'
+    });
+  }
+
   async dismissAlert(alertId, reason) {
     return this.request(`/admin/alerts/${alertId}/dismiss`, {
       method: 'POST',
@@ -157,6 +183,18 @@ class AdminApiService {
   // Reports
   async getDashboardStats() {
     return this.request('/admin/reports/dashboard');
+  }
+
+  async getReports(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/admin/reports?${queryString}`);
+  }
+
+  async generateReport(type, dateRange) {
+    return this.request('/admin/reports/generate', {
+      method: 'POST',
+      body: JSON.stringify({ type, dateRange })
+    });
   }
 
   async getTransactionReport(params = {}) {
