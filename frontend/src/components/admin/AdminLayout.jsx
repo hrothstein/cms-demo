@@ -21,7 +21,7 @@ const AdminLayout = () => {
     if (!isAuthenticated && !isLoading) {
       navigate('/admin/login');
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading]);
 
   if (!isAuthenticated) {
     return null;
