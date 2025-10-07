@@ -111,6 +111,7 @@ const AdminCardsPage = () => {
   };
 
   const formatCardNumber = (cardNumber, canViewFull = false) => {
+    if (!cardNumber) return '**** **** **** ****';
     if (canViewFull && hasPermission('VIEW_FULL_CARD_NUMBER')) {
       return cardNumber;
     }
