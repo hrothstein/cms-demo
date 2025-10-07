@@ -243,23 +243,23 @@ const AdminCardsPage = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">
-                          {formatCardNumber(card.card_number, true)}
+                          {formatCardNumber(card.cardNumber, true)}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {card.customer_name} • {card.card_type} • Expires {card.expiry_date}
+                          {card.customerName} • {card.cardType} • Expires {card.expiryDate}
                         </p>
                         <p className="text-xs text-gray-400">
-                          Created: {new Date(card.created_at).toLocaleDateString()}
+                          Created: {new Date(card.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(card.card_status)}`}>
-                      {card.card_status}
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(card.cardStatus)}`}>
+                      {card.cardStatus}
                     </span>
                     <div className="flex space-x-2">
-                      {card.card_status === 'ACTIVE' && hasPermission('LOCK_CARDS') && (
+                      {card.cardStatus === 'ACTIVE' && hasPermission('LOCK_CARDS') && (
                         <button
                           onClick={() => handleLockCard(card)}
                           className="text-red-600 hover:text-red-900 text-sm font-medium"
@@ -267,7 +267,7 @@ const AdminCardsPage = () => {
                           Lock Card
                         </button>
                       )}
-                      {card.card_status === 'LOCKED' && hasPermission('LOCK_CARDS') && (
+                      {card.cardStatus === 'LOCKED' && hasPermission('LOCK_CARDS') && (
                         <button
                           onClick={() => handleUnlockCard(card)}
                           className="text-green-600 hover:text-green-900 text-sm font-medium"
@@ -276,7 +276,7 @@ const AdminCardsPage = () => {
                         </button>
                       )}
                       <Link
-                        to={`/admin/cards/${card.card_id}`}
+                        to={`/admin/cards/${card.cardId}`}
                         className="text-blue-600 hover:text-blue-900 text-sm font-medium"
                       >
                         View Details
