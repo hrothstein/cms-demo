@@ -18,6 +18,7 @@ import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminCustomersPage from './pages/admin/AdminCustomersPage'
 import AdminCardsPage from './pages/admin/AdminCardsPage'
+import AdminCardDetailPage from './pages/admin/AdminCardDetailPage'
 import AdminTransactionsPage from './pages/admin/AdminTransactionsPage'
 import AdminDisputesPage from './pages/admin/AdminDisputesPage'
 import AdminAlertsPage from './pages/admin/AdminAlertsPage'
@@ -84,6 +85,7 @@ function App() {
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="customers" element={<AdminCustomersPage />} />
             <Route path="cards" element={<AdminCardsPage />} />
+            <Route path="cards/:cardId" element={<AdminCardDetailPage />} />
             <Route path="transactions" element={<AdminTransactionsPage />} />
             <Route path="disputes" element={<AdminDisputesPage />} />
             <Route path="alerts" element={<AdminAlertsPage />} />
