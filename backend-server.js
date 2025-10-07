@@ -11,30 +11,30 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Import database connection
-const { query } = require('./config/database');
+const { query } = require('./src/config/database');
 
 // Import routes
-const cardRoutes = require('./routes/cards');
-const transactionRoutes = require('./routes/transactions');
-const customerRoutes = require('./routes/customers');
-const fraudRoutes = require('./routes/fraud');
-const notificationRoutes = require('./routes/notifications');
+const cardRoutes = require('./src/routes/cards');
+const transactionRoutes = require('./src/routes/transactions');
+const customerRoutes = require('./src/routes/customers');
+const fraudRoutes = require('./src/routes/fraud');
+const notificationRoutes = require('./src/routes/notifications');
 
 // Import admin routes
-const adminAuthRoutes = require('./routes/admin/auth');
-const adminCustomerRoutes = require('./routes/admin/customers');
-const adminCardRoutes = require('./routes/admin/cards');
-const adminTransactionRoutes = require('./routes/admin/transactions');
-const adminDisputeRoutes = require('./routes/admin/disputes');
-const adminAlertRoutes = require('./routes/admin/alerts');
-const adminReportRoutes = require('./routes/admin/reports');
-const adminAuditLogRoutes = require('./routes/admin/auditLogs');
-const adminNoteRoutes = require('./routes/admin/notes');
+const adminAuthRoutes = require('./src/routes/admin/auth');
+const adminCustomerRoutes = require('./src/routes/admin/customers');
+const adminCardRoutes = require('./src/routes/admin/cards');
+const adminTransactionRoutes = require('./src/routes/admin/transactions');
+const adminDisputeRoutes = require('./src/routes/admin/disputes');
+const adminAlertRoutes = require('./src/routes/admin/alerts');
+const adminReportRoutes = require('./src/routes/admin/reports');
+const adminAuditLogRoutes = require('./src/routes/admin/auditLogs');
+const adminNoteRoutes = require('./src/routes/admin/notes');
 
 // Import middleware
-const authMiddleware = require('./middleware/auth');
-const adminAuthMiddleware = require('./middleware/adminAuth');
-const errorHandler = require('./middleware/errorHandler');
+const authMiddleware = require('./src/middleware/auth');
+const adminAuthMiddleware = require('./src/middleware/adminAuth');
+const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
