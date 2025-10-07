@@ -6,6 +6,11 @@ const { auditLogs } = require('../../middleware/auditLog');
 
 const router = express.Router();
 
+// Test endpoint
+router.get('/test', (req, res) => {
+  res.json({ success: true, message: 'Admin auth routes working' });
+});
+
 // Admin login endpoint
 router.post('/login', auditLogs.adminLogin, async (req, res) => {
   try {
