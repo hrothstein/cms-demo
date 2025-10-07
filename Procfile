@@ -1,2 +1,1 @@
-web: node src/server.js
-frontend: node start-frontend.js
+web: node backend-server.js
