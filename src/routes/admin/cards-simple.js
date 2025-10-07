@@ -97,6 +97,83 @@ router.get('/', checkPermission('VIEW_CARDS'), async (req, res) => {
   }
 });
 
+// Create new card
+router.post('/', checkPermission('CREATE_CARDS'), async (req, res) => {
+  try {
+    const {
+      customerId,
+      cardType = 'DEBIT',
+      cardBrand = 'VISA',
+      cardFormat = 'PHYSICAL',
+      isPrimary = false,
+      creditLimit = null,
+      expiryDate
+    } = req.body;
+
+    // Validate required fields
+    if (!customerId) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_REQUIRED_FIELD',
+          message: 'customerId is required'
+        }
+      });
+    }
+
+    // Generate mock card data
+    const cardId = `CARD-${Date.now()}`;
+    const cardNumber = cardType === 'CREDIT' ? '5555555555555678' : '4111111111111234';
+    const cardLastFour = cardNumber.slice(-4);
+    const issueDate = new Date().toISOString().split('T')[0];
+    const finalExpiryDate = expiryDate || new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 3 years from now
+
+    // Mock response - in real implementation, this would insert into database
+    const newCard = {
+      card_id: cardId,
+      cardId: cardId,
+      customerId: customerId,
+      cardNumber: cardNumber,
+      cardLastFour: cardLastFour,
+      cardType: cardType,
+      cardBrand: cardBrand,
+      cardStatus: 'PENDING_ACTIVATION',
+      cardSubStatus: null,
+      customerName: `Customer ${customerId}`, // In real implementation, fetch from customer table
+      cardholderName: `Customer ${customerId}`,
+      issueDate: issueDate,
+      expiryDate: finalExpiryDate,
+      activationDate: null,
+      creditLimit: cardType === 'CREDIT' ? (creditLimit || 5000.00) : null,
+      availableCredit: cardType === 'CREDIT' ? (creditLimit || 5000.00) : null,
+      isPrimary: isPrimary,
+      cardFormat: cardFormat,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      customer: {
+        username: `customer${customerId}`,
+        email: `customer${customerId}@example.com`,
+        phone: '+1234567890'
+      }
+    };
+
+    res.status(201).json({
+      success: true,
+      message: 'Card created successfully',
+      data: newCard
+    });
+  } catch (error) {
+    console.error('Error creating card:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred while creating the card'
+      }
+    });
+  }
+});
+
 // Lock card
 router.post('/:cardId/lock', checkPermission('LOCK_CARDS'), async (req, res) => {
   try {
