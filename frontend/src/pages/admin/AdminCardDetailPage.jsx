@@ -20,7 +20,30 @@ const AdminCardDetailPage = () => {
       setIsLoading(true);
       // For now, we'll use mock data since we don't have a specific card detail API
       // In a real implementation, this would call adminApi.getCard(cardId)
-      const mockCard = {
+      // Mock data based on cardId - CARD-001 is DEBIT, CARD-002 is CREDIT
+      const mockCard = cardId === 'CARD-002' ? {
+        card_id: cardId,
+        card_number: '5555555555555678',
+        card_type: 'CREDIT',
+        card_brand: 'MASTERCARD',
+        card_status: 'ACTIVE',
+        customer_name: 'Jane Smith',
+        customer_id: 'CUST-67890',
+        expiry_date: '2027-02-01',
+        issue_date: '2024-02-01',
+        activation_date: '2024-02-02T14:20:00Z',
+        creditLimit: 5000.00,
+        availableCredit: 4500.00,
+        is_primary: false,
+        card_format: 'VIRTUAL',
+        created_at: '2024-02-01T08:00:00Z',
+        updated_at: '2024-02-01T08:00:00Z',
+        customer: {
+          username: 'janesmith',
+          email: 'jane@example.com',
+          phone: '+1987654321'
+        }
+      } : {
         card_id: cardId,
         card_number: '4111111111111234',
         card_type: 'DEBIT',
@@ -31,8 +54,8 @@ const AdminCardDetailPage = () => {
         expiry_date: '2027-01-15',
         issue_date: '2024-01-15',
         activation_date: '2024-01-16T10:30:00Z',
-        credit_limit: null,
-        available_credit: null,
+        creditLimit: null,
+        availableCredit: null,
         is_primary: true,
         card_format: 'PHYSICAL',
         created_at: '2024-01-15T09:00:00Z',
@@ -203,16 +226,16 @@ const AdminCardDetailPage = () => {
                 {card.activation_date ? new Date(card.activation_date).toLocaleString() : 'Not activated'}
               </dd>
             </div>
-            {card.credit_limit && (
+            {card.creditLimit && (
               <div>
                 <dt className="text-sm font-medium text-gray-500">Credit Limit</dt>
-                <dd className="mt-1 text-sm text-gray-900">${card.credit_limit.toLocaleString()}</dd>
+                <dd className="mt-1 text-sm text-gray-900">${card.creditLimit.toLocaleString()}</dd>
               </div>
             )}
-            {card.available_credit && (
+            {card.availableCredit && (
               <div>
                 <dt className="text-sm font-medium text-gray-500">Available Credit</dt>
-                <dd className="mt-1 text-sm text-gray-900">${card.available_credit.toLocaleString()}</dd>
+                <dd className="mt-1 text-sm text-gray-900">${card.availableCredit.toLocaleString()}</dd>
               </div>
             )}
             <div>
