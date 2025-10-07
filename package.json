@@ -1,52 +1,29 @@
 {
-  "name": "card-management-backend",
+  "name": "card-management-system",
   "version": "1.0.0",
-  "description": "Demo backend system for Card Management System - simulates core banking operations",
-  "main": "src/server.js",
+  "description": "Card Management System demonstrating MuleSoft integration capabilities",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "test": "jest",
-    "test-demo": "node scripts/test-demo.js",
-    "setup-db": "node scripts/setup-db.js",
-    "seed": "node scripts/seed-data.js",
-    "build": "cd frontend && npm install && npm run build",
-    "heroku-postbuild": "cd frontend && npm install && npm run build"
-  },
-  "keywords": [
-    "banking",
-    "card-management",
-    "api",
-    "demo",
-    "mulesoft"
-  ],
-  "author": "Demo Team",
-  "license": "MIT",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "express-rate-limit": "^7.1.5",
-    "faker": "^6.6.6",
-    "helmet": "^7.1.0",
-    "joi": "^17.11.0",
-    "jsonwebtoken": "^9.0.2",
-    "moment": "^2.29.4",
-    "morgan": "^1.10.0",
-    "pg": "^8.11.3",
-    "rate-limiter-flexible": "^2.4.1",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-    "uuid": "^9.0.1",
-    "yamljs": "^0.3.0"
+    "dev:all": "concurrently \"npm run dev:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:db": "cd cms-database && npm run setup",
+    "dev:backend": "cd cms-backend && npm run dev",
+    "dev:frontend": "cd cms-frontend && npm run dev",
+    "build": "cd cms-frontend && npm run build",
+    "start": "cd cms-backend && npm start",
+    "install:all": "npm install && cd cms-database && npm install && cd ../cms-backend && npm install && cd ../cms-frontend && npm install",
+    "setup": "npm run install:all && npm run dev:db"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
-    "nodemon": "^3.0.2",
-    "supertest": "^6.3.3"
+    "concurrently": "^8.2.2"
   },
-  "engines": {
-    "node": ">=16.0.0"
-  }
+  "keywords": [
+    "mulesoft",
+    "card-management",
+    "banking",
+    "api-led-connectivity",
+    "react",
+    "nodejs",
+    "postgresql"
+  ],
+  "author": "MuleSoft Solutions Engineering",
+  "license": "MIT"
 }

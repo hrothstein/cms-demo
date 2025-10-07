@@ -1,386 +1,309 @@
 # Card Management System (CMS)
 
-A comprehensive demo Card Management System built with Node.js, React, and PostgreSQL. This system demonstrates modern card lifecycle management for financial services and provides REST APIs that MuleSoft can integrate with to showcase API-led connectivity patterns.
+A comprehensive demonstration of MuleSoft's API-led connectivity and integration capabilities for financial services. This standalone web application showcases real-world card lifecycle management integrated with the HBR Core Banking System via MuleSoft.
 
-## 🚀 Features
+## 🎯 Overview
 
-### Core Functionality
-- **Card Management**: View, lock/unlock, and control debit/credit cards
-- **Transaction History**: Comprehensive transaction tracking with search and filters
-- **Fraud Management**: Dispute filing and fraud reporting capabilities
-- **Alerts & Notifications**: Real-time security alerts and customizable notifications
-- **User Settings**: Profile management and notification preferences
-
-### Technical Features
-- **RESTful APIs**: Complete API suite with Swagger documentation
-- **JWT Authentication**: Secure token-based authentication
-- **Database Integration**: PostgreSQL with proper schema and relationships
-- **Responsive UI**: Modern React frontend with Tailwind CSS
-- **Docker Support**: Easy deployment with Docker Compose
-- **Demo Data**: Realistic seed data for testing and demonstration
+The Card Management System is a modern, full-stack web application that demonstrates how MuleSoft enables seamless integration between customer-facing applications and core banking systems. It showcases API-led connectivity patterns, real-time data synchronization, and modern user experience design.
 
 ## 🏗️ Architecture
 
 ```
-Customer Web UI (React)
-       ↓
-CMS Backend (Node.js/Express)
-       ↓
-CMS Database (PostgreSQL)
-       ↓
-REST APIs (exposed to MuleSoft)
-       ↓
-[MuleSoft Integration Layer]
-       ↓
-HBR Core Banking System APIs
+┌─────────────────────────┐
+│  Customer Web Portal    │  ← React/TypeScript Frontend
+│   (CMS Frontend)        │
+└───────────┬─────────────┘
+            │
+┌───────────▼─────────────┐
+│    CMS Backend API      │  ← Node.js/Express
+│  (Card Management)      │
+└───────────┬─────────────┘
+            │
+┌───────────▼─────────────┐
+│   MuleSoft Layer        │  ← Integration & Orchestration
+│  (API-Led Connectivity) │
+└───────────┬─────────────┘
+            │
+┌───────────▼─────────────┐
+│  HBR Core Banking API   │  ← Existing System
+└─────────────────────────┘
 ```
 
-## 🛠️ Technology Stack
+## ✨ Features
 
-### Backend
-- **Node.js** (v18+) - Runtime environment
-- **Express.js** - Web framework
-- **PostgreSQL** (v14+) - Database
-- **JWT** - Authentication
-- **bcrypt** - Password hashing
-- **Swagger** - API documentation
+### Customer Features
+- **Card Dashboard**: View all cards with real-time status and balances
+- **Card Controls**: Lock/unlock cards, set spending limits, configure transaction types
+- **Transaction Management**: View history, filter transactions, dispute charges
+- **Alerts & Notifications**: Real-time alerts for suspicious activity
+- **Dispute Management**: Submit and track transaction disputes
+- **Card Services**: PIN management, card replacement, activation
 
-### Frontend
-- **React** (v18+) - UI library
-- **Vite** - Build tool
-- **Tailwind CSS** - Styling
-- **React Router** - Client-side routing
-- **React Query** - Data fetching/caching
-- **Zustand** - State management
-
-### Development
-- **Docker & Docker Compose** - Containerization
-- **ESLint + Prettier** - Code formatting
-- **Jest + Supertest** - Testing
-
-## 📋 Prerequisites
-
-- Node.js (v18 or higher)
-- Docker and Docker Compose
-- Git
+### Technical Features
+- **API-Led Connectivity**: 3-layer API architecture (Experience, Process, System)
+- **Real-time Integration**: Live data sync with core banking system
+- **Security**: JWT authentication, rate limiting, audit logging
+- **Responsive Design**: Mobile-first UI that works on all devices
+- **MuleSoft Integration**: Simulated integration points for demo purposes
 
 ## 🚀 Quick Start
 
-### Option 1: Docker Compose (Recommended)
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 12+
+- npm or yarn
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd CMS
-   ```
-
-2. **Start the application**
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:3000
-   - API Documentation: http://localhost:3000/api-docs
-   - Database: localhost:5432
-
-### Option 2: Manual Setup
-
-1. **Clone and setup**
-   ```bash
-   git clone <repository-url>
-   cd CMS
-   ```
-
-2. **Install dependencies**
-   ```bash
-   # Backend
-   npm install
-
-   # Frontend
-   cd frontend
-   npm install
-   cd ..
-   ```
-
-3. **Setup database**
-   ```bash
-   # Start PostgreSQL (using Docker)
-   docker run --name cms-postgres -e POSTGRES_DB=cms_db -e POSTGRES_USER=cms_user -e POSTGRES_PASSWORD=cms_password -p 5432:5432 -d postgres:14
-
-   # Run migrations and seed data
-   psql -h localhost -U cms_user -d cms_db -f database/schema.sql
-   psql -h localhost -U cms_user -d cms_db -f database/seeds/seed_data.sql
-   ```
-
-4. **Configure environment**
-   ```bash
-   cp env.example .env
-   # Edit .env with your configuration
-   ```
-
-5. **Start the application**
-   ```bash
-   # Terminal 1 - Backend
-   npm run dev
-
-   # Terminal 2 - Frontend
-   cd frontend
-   npm run dev
-   ```
-
-## 🔐 Demo Credentials
-
-| Username | Password | Description |
-|----------|----------|-------------|
-| john.doe | demo123 | Customer with 2 cards |
-| jane.smith | demo123 | Customer with fraud alert |
-| bob.johnson | demo123 | Customer with locked card |
-
-## 📚 API Documentation
-
-Once the application is running, visit http://localhost:3000/api-docs for interactive API documentation.
-
-### Key API Endpoints
-
-#### Authentication
-- `POST /api/v1/auth/login` - User login
-
-#### Cards
-- `GET /api/v1/cards` - Get all cards for customer
-- `GET /api/v1/cards/:cardId` - Get specific card details
-- `POST /api/v1/cards/:cardId/lock` - Lock a card
-- `POST /api/v1/cards/:cardId/unlock` - Unlock a card
-- `GET /api/v1/cards/:cardId/controls` - Get card controls
-- `PUT /api/v1/cards/:cardId/controls` - Update card controls
-
-#### Transactions
-- `GET /api/v1/transactions` - Get transaction history
-- `GET /api/v1/transactions/:transactionId` - Get transaction details
-- `GET /api/v1/transactions/search` - Search transactions
-
-#### Fraud & Disputes
-- `GET /api/v1/fraud/disputes` - Get all disputes
-- `POST /api/v1/fraud/disputes` - File a new dispute
-- `POST /api/v1/fraud/report-fraud` - Report suspected fraud
-
-#### Notifications
-- `GET /api/v1/notifications/alerts` - Get alerts
-- `PUT /api/v1/notifications/alerts/:alertId/read` - Mark alert as read
-- `GET /api/v1/notifications/preferences` - Get notification preferences
-- `PUT /api/v1/notifications/preferences` - Update preferences
-
-## 🎯 Demo Scenarios
-
-### Scenario 1: Lock Card While Traveling
-1. Login as john.doe
-2. Navigate to Cards page
-3. Click on a card to view details
-4. Click "Lock Card" button
-5. Card status changes to LOCKED
-
-### Scenario 2: View Recent Transactions
-1. Login as jane.smith
-2. Navigate to Transactions page
-3. View list of recent transactions
-4. Use filters to search by category or date
-5. Click on a transaction for details
-
-### Scenario 3: Set Spending Limit
-1. Login as john.doe
-2. Go to card details page
-3. Click "Update Controls"
-4. Set daily limit to $500
-5. Save changes
-
-### Scenario 4: Report Fraud
-1. Login as jane.smith
-2. Navigate to Transactions page
-3. Find the suspicious $845 transaction
-4. Click "File Dispute"
-5. Fill out dispute form
-
-### Scenario 5: View Alerts
-1. Login as any user
-2. Navigate to Alerts page
-3. View security alerts
-4. Mark alerts as read
-
-## 🗄️ Database Schema
-
-The system uses PostgreSQL with the following main tables:
-
-- **users** - User authentication and profiles
-- **cards** - Card information and status
-- **card_controls** - Card spending limits and restrictions
-- **transactions** - Transaction history and details
-- **alerts** - Security alerts and notifications
-- **disputes** - Fraud disputes and cases
-- **notification_preferences** - User notification settings
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Server Configuration
-PORT=3000
-NODE_ENV=development
-
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=cms_db
-DB_USER=cms_user
-DB_PASSWORD=cms_password
-
-# JWT Configuration
-JWT_SECRET=your-jwt-secret-key-change-in-production
-JWT_EXPIRES_IN=1h
-
-# Encryption Configuration
-ENCRYPTION_KEY=your-32-char-encryption-key-here
-```
-
-### Frontend Configuration
-
-Create a `.env` file in the frontend directory:
-
-```env
-VITE_API_URL=http://localhost:3000/api/v1
-```
-
-## 🧪 Testing
-
-### Backend Tests
+### 1. Database Setup
 ```bash
-npm test
+cd cms-database
+npm install
+npm run setup
 ```
 
-### Frontend Tests
+### 2. Backend Setup
 ```bash
-cd frontend
-npm test
+cd cms-backend
+npm install
+cp env.example .env
+# Edit .env with your database credentials
+npm run dev
 ```
 
-## 🐳 Docker Commands
-
+### 3. Frontend Setup
 ```bash
-# Start all services
-docker-compose up -d
+cd cms-frontend
+npm install
+cp .env.example .env
+# Edit .env with your backend API URL
+npm run dev
+```
 
-# View logs
-docker-compose logs -f
+### 4. Access the Application
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3000
+- API Docs: http://localhost:3000/api/v1/docs
 
-# Stop all services
-docker-compose down
+## 🔑 Demo Credentials
 
-# Rebuild and start
-docker-compose up --build -d
+```
+Email: sarah.demo@example.com
+Password: Demo123!
 
-# Remove volumes (reset database)
-docker-compose down -v
+Email: john.demo@example.com
+Password: Demo123!
+
+Email: emma.demo@example.com
+Password: Demo123!
 ```
 
 ## 📁 Project Structure
 
 ```
-CMS/
-├── backend/
+/
+├── cms-backend/              # Node.js/Express API
 │   ├── src/
-│   │   ├── routes/         # API route handlers
-│   │   ├── controllers/    # Business logic
-│   │   ├── models/         # Database models
-│   │   ├── middleware/     # Auth, validation
-│   │   ├── services/       # External integrations
-│   │   ├── utils/          # Helper functions
-│   │   └── config/         # Configuration
-│   ├── tests/
+│   │   ├── config/           # Database configuration
+│   │   ├── middleware/       # Auth, validation, error handling
+│   │   ├── routes/           # API route handlers
+│   │   ├── services/         # MuleSoft integration layer
+│   │   └── server.js         # Express app setup
 │   ├── package.json
-│   └── server.js
-├── frontend/
+│   └── README.md
+│
+├── cms-frontend/             # React/TypeScript SPA
 │   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API client
-│   │   ├── stores/         # State management
-│   │   ├── utils/          # Utilities
-│   │   └── App.jsx
+│   │   ├── components/       # Reusable UI components
+│   │   ├── pages/            # Page components
+│   │   ├── context/          # React Context (Auth)
+│   │   ├── services/         # API client services
+│   │   └── App.jsx           # Main app component
 │   ├── package.json
-│   └── index.html
-├── database/
-│   ├── migrations/         # DB migrations
-│   ├── seeds/             # Demo data
-│   └── schema.sql         # DB schema
-├── docker-compose.yml     # Local development
-└── README.md
+│   └── README.md
+│
+├── cms-database/             # Database setup and seed data
+│   ├── migrations/           # SQL schema migrations
+│   ├── seeds/                # Demo data
+│   ├── setup.js              # Database setup script
+│   └── package.json
+│
+└── README.md                 # This file
 ```
 
-## 🤝 MuleSoft Integration
+## 🔌 API Endpoints
 
-This CMS is designed to integrate with MuleSoft for API-led connectivity demonstrations. The system provides:
+### Authentication
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/logout` - User logout
+- `GET /api/v1/auth/me` - Get current user info
 
-- **RESTful APIs** for all card management operations
-- **JWT Authentication** for secure API access
-- **Comprehensive Error Handling** with standardized error responses
-- **Swagger Documentation** for easy API discovery
-- **Demo Data** for realistic testing scenarios
+### Cards
+- `GET /api/v1/cards` - Get all user cards
+- `GET /api/v1/cards/:cardId` - Get specific card details
+- `PUT /api/v1/cards/:cardId/lock` - Lock a card
+- `PUT /api/v1/cards/:cardId/unlock` - Unlock a card
+- `PUT /api/v1/cards/:cardId/controls` - Update card controls
+
+### Transactions
+- `GET /api/v1/cards/:cardId/transactions` - Get transactions for a card
+- `GET /api/v1/transactions/:transactionId` - Get specific transaction details
+
+### Alerts
+- `GET /api/v1/alerts` - Get all user alerts
+- `PUT /api/v1/alerts/:alertId/read` - Mark alert as read
+- `GET /api/v1/alerts/preferences` - Get alert preferences
+- `PUT /api/v1/alerts/preferences` - Update alert preferences
+
+### Disputes
+- `POST /api/v1/disputes` - Submit a new dispute
+- `GET /api/v1/disputes` - Get all user disputes
+- `GET /api/v1/disputes/:disputeId` - Get specific dispute details
+
+### Card Services
+- `POST /api/v1/card-services/view-pin` - View PIN (with re-auth)
+- `POST /api/v1/card-services/change-pin` - Change PIN
+- `POST /api/v1/card-services/request-replacement` - Request card replacement
+
+## 🔗 MuleSoft Integration
+
+The system includes simulated MuleSoft integration points that demonstrate API-led connectivity:
 
 ### Integration Points
+- **Customer Sync**: Fetch and sync customer data with HBR Core Banking
+- **Account Sync**: Real-time balance updates from HBR
+- **Card Operations**: Lock/unlock and control sync with HBR
+- **Transaction Streaming**: Real-time transaction updates
+- **Fraud Management**: Dispute submission to HBR fraud system
+- **Card Services**: Integration with HBR card production system
 
-MuleSoft can integrate with the CMS through:
+### 3-Layer API Architecture
+1. **Experience API**: Tailored for CMS UI needs
+2. **Process API**: Business logic and workflows
+3. **System API**: Direct HBR connectivity
 
-1. **Authentication Flow**: Validate user credentials and obtain JWT tokens
-2. **Card Operations**: Fetch card data, update controls, lock/unlock cards
-3. **Transaction Processing**: Retrieve transaction history and details
-4. **Fraud Management**: Handle disputes and fraud reports
-5. **Notification Management**: Send alerts and manage preferences
+## 🎬 Demo Scenarios
 
-## 🐛 Troubleshooting
+### 1. Card Lock After Suspicious Activity
+1. Show transaction list with recent activity
+2. Highlight suspicious transaction
+3. Alert appears: "Unusual transaction detected"
+4. Click alert → View transaction details
+5. Click "Lock Card" button
+6. Card status changes to "Locked" immediately
+7. Show MuleSoft logs: CMS → MuleSoft → HBR
 
-### Common Issues
+### 2. Setting International Travel Controls
+1. Navigate to Card Controls
+2. Enable "International Transactions"
+3. Add countries to whitelist
+4. Set daily limit
+5. Save controls
+6. Show MuleSoft orchestration
 
-1. **Database Connection Error**
-   - Ensure PostgreSQL is running
-   - Check database credentials in `.env`
-   - Verify database exists and migrations are run
+### 3. Dispute a Transaction
+1. View transaction list
+2. Find incorrect transaction
+3. Click "Dispute Transaction"
+4. Select dispute type and enter reason
+5. Submit dispute
+6. Show dispute created with status tracking
+7. Show MuleSoft routing to HBR fraud system
 
-2. **Frontend Not Loading**
-   - Check if backend is running on port 3000
-   - Verify `VITE_API_URL` in frontend `.env`
-   - Check browser console for errors
+## 🛠️ Technology Stack
 
-3. **Authentication Issues**
-   - Verify JWT_SECRET is set in `.env`
-   - Check if demo users exist in database
-   - Clear browser localStorage and try again
+### Backend
+- **Node.js 20** with Express.js
+- **PostgreSQL** with connection pooling
+- **JWT** authentication
+- **Joi** validation
+- **Rate limiting** and security middleware
 
-4. **Docker Issues**
-   - Run `docker-compose down -v` to reset
-   - Check logs with `docker-compose logs`
-   - Ensure ports 3000, 5173, and 5432 are available
+### Frontend
+- **React 18** with TypeScript
+- **Tailwind CSS** for styling
+- **React Router v6** for routing
+- **Axios** for API calls
+- **React Hook Form** for forms
+- **Vite** for build tooling
 
-### Getting Help
+### Integration
+- **MuleSoft** Anypoint Platform (simulated)
+- **API-led connectivity** patterns
+- **Real-time data synchronization**
 
-1. Check the logs: `docker-compose logs -f`
-2. Verify all services are running: `docker-compose ps`
-3. Test API endpoints directly: http://localhost:3000/health
-4. Check browser developer tools for frontend errors
+## 🔐 Security Features
+
+- **JWT Authentication** with short-lived tokens
+- **Password Hashing** with bcrypt
+- **Rate Limiting** (100 requests per 15 minutes)
+- **Input Validation** with Joi schemas
+- **CORS Protection** with configurable origins
+- **Audit Logging** for all actions
+- **Error Handling** without data leakage
+
+## 📊 Database Schema
+
+The system uses PostgreSQL with the following key tables:
+- `customers` - Customer information
+- `cards` - Card details and status
+- `card_controls` - Card control settings
+- `transactions` - Transaction history
+- `alerts` - Alert notifications
+- `disputes` - Dispute management
+- `audit_log` - Security audit trail
+
+## 🚀 Deployment
+
+### Development
+```bash
+# Start all services
+npm run dev:all
+```
+
+### Production
+```bash
+# Build frontend
+cd cms-frontend && npm run build
+
+# Start backend
+cd cms-backend && npm start
+```
+
+### Docker (Optional)
+```bash
+docker-compose up -d
+```
+
+## 📈 Success Metrics
+
+### Technical Metrics
+- API response time: <200ms (95th percentile)
+- Uptime: 99.9%
+- Transaction sync latency: <2 seconds
+- Zero data loss
+
+### Demo Effectiveness
+- Clearly showcases MuleSoft API-led connectivity
+- Demonstrates 3-layer API architecture
+- Shows real-time data synchronization
+- Highlights security features
+- Proves integration between modern and legacy systems
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🆘 Support
 
-- Built for MuleSoft integration demonstrations
-- Inspired by modern banking applications
-- Uses industry-standard security practices
-- Designed for educational and demo purposes
+For questions or support, please contact the development team or refer to the individual README files in each component directory.
 
 ---
 
-**Note**: This is a DEMO system. It uses simulated data and should NOT be used with real card numbers or customer information. All card numbers are mock data for demonstration purposes only.
+**Built with ❤️ to demonstrate MuleSoft's integration capabilities for Financial Services**
