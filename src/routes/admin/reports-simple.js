@@ -27,7 +27,13 @@ router.get('/dashboard', checkPermission('GENERATE_REPORTS'), async (req, res) =
       cardsToday: 8,
       alertsToday: 2,
       customersToday: 12,
-      disputesToday: 1
+      disputesToday: 1,
+      // Additional fields needed by the frontend
+      openDisputes: 12,
+      unresolvedAlerts: 5,
+      transactionsThisWeek: 2340,
+      transactionsThisMonth: 15420,
+      lockedCards: 58
     };
 
     res.json({
