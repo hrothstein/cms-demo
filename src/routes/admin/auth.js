@@ -57,7 +57,7 @@ router.post('/login', auditLogs.adminLogin, async (req, res) => {
 
     // Update last login
     await query(
-      'UPDATE admin_users SET last_login = $1 WHERE admin_id = $2',
+      'UPDATE admin_users SET last_login = $1 WHERE id = $2',
       [new Date().toISOString(), admin.admin_id]
     );
 
