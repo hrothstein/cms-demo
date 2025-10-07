@@ -23,12 +23,12 @@ const notificationRoutes = require('./src/routes/notifications');
 // Import admin routes
 const adminAuthRoutes = require('./src/routes/admin/auth');
 const adminCustomerRoutes = require('./src/routes/admin/customers');
-const adminCardRoutes = require('./src/routes/admin/cards');
+const adminCardRoutes = require('./src/routes/admin/cards-simple');
 const adminTransactionRoutes = require('./src/routes/admin/transactions');
 const adminDisputeRoutes = require('./src/routes/admin/disputes');
 const adminAlertRoutes = require('./src/routes/admin/alerts');
-const adminReportRoutes = require('./src/routes/admin/reports');
-const adminAuditLogRoutes = require('./src/routes/admin/auditLogs');
+const adminReportRoutes = require('./src/routes/admin/reports-simple');
+const adminAuditLogRoutes = require('./src/routes/admin/auditLogs-simple');
 const adminNoteRoutes = require('./src/routes/admin/notes');
 
 // Import middleware
