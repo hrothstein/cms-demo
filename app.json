@@ -1,0 +1,21 @@
+{
+  "name": "CMS Frontend",
+  "description": "Card Management System Frontend",
+  "repository": "https://github.com/hrothstein/cms-demo",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment",
+      "value": "production"
+    }
+  }
+}
