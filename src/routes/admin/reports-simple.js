@@ -20,7 +20,14 @@ router.get('/dashboard', checkPermission('GENERATE_REPORTS'), async (req, res) =
       thisMonthVolume: 2847500.50,
       fraudAlerts: 3,
       disputedTransactions: 12,
-      pendingApprovals: 8
+      pendingApprovals: 8,
+      // Add missing fields that the dashboard expects
+      transactionsToday: 156,
+      transactionVolumeToday: 23450.75,
+      cardsToday: 8,
+      alertsToday: 2,
+      customersToday: 12,
+      disputesToday: 1
     };
 
     res.json({
