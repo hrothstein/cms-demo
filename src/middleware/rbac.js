@@ -75,7 +75,7 @@ const checkPermission = (requiredPermission) => {
       });
     }
 
-    const adminRole = req.admin.role;
+    const adminRole = req.admin.role.toUpperCase();
     const permissions = rolePermissions[adminRole] || [];
     
     if (permissions.includes(requiredPermission)) {
@@ -107,7 +107,7 @@ const checkAnyPermission = (requiredPermissions) => {
       });
     }
 
-    const adminRole = req.admin.role;
+    const adminRole = req.admin.role.toUpperCase();
     const permissions = rolePermissions[adminRole] || [];
     
     const hasPermission = requiredPermissions.some(permission => 
