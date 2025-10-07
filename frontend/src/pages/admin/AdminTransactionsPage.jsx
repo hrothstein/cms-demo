@@ -18,8 +18,10 @@ const AdminTransactionsPage = () => {
   });
 
   useEffect(() => {
-    fetchTransactions();
-  }, [searchTerm, statusFilter, dateFilter, pagination.offset]);
+    if (pagination) {
+      fetchTransactions();
+    }
+  }, [searchTerm, statusFilter, dateFilter, pagination?.offset]);
 
   const fetchTransactions = async () => {
     try {

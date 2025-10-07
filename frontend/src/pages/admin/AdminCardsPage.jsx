@@ -23,8 +23,10 @@ const AdminCardsPage = () => {
   const { hasPermission } = useAdmin();
 
   useEffect(() => {
-    fetchCards();
-  }, [searchTerm, statusFilter, pagination.offset]);
+    if (pagination) {
+      fetchCards();
+    }
+  }, [searchTerm, statusFilter, pagination?.offset]);
 
   const fetchCards = async () => {
     try {
