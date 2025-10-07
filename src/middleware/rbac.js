@@ -4,6 +4,7 @@
 const rolePermissions = {
   CSR: [
     'VIEW_CUSTOMERS',
+    'CREATE_CUSTOMERS',
     'VIEW_CARDS', 
     'LOCK_CARDS',
     'UPDATE_CARD_CONTROLS',
@@ -15,6 +16,7 @@ const rolePermissions = {
   ],
   FRAUD_ANALYST: [
     'VIEW_CUSTOMERS',
+    'CREATE_CUSTOMERS',
     'VIEW_CARDS',
     'VIEW_FULL_CARD_NUMBER',
     'LOCK_CARDS',
@@ -29,6 +31,7 @@ const rolePermissions = {
   ],
   SUPERVISOR: [
     'VIEW_CUSTOMERS',
+    'CREATE_CUSTOMERS',
     'VIEW_CARDS',
     'VIEW_FULL_CARD_NUMBER',
     'CREATE_CARDS',
@@ -46,6 +49,7 @@ const rolePermissions = {
   ],
   ADMIN: [
     'VIEW_CUSTOMERS',
+    'CREATE_CUSTOMERS',
     'VIEW_CARDS',
     'VIEW_FULL_CARD_NUMBER',
     'CREATE_CARDS',

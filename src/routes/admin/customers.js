@@ -282,4 +282,200 @@ router.get('/:customerId', checkPermission('VIEW_CUSTOMERS'), async (req, res) =
   }
 });
 
+// Create new customer
+router.post('/', checkPermission('CREATE_CUSTOMERS'), async (req, res) => {
+  try {
+    const {
+      username,
+      email,
+      phone,
+      firstName,
+      lastName,
+      dateOfBirth,
+      address,
+      city,
+      state,
+      zipCode,
+      country = 'US'
+    } = req.body;
+
+    // Validate required fields
+    if (!username || !email || !firstName || !lastName) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_REQUIRED_FIELD',
+          message: 'username, email, firstName, and lastName are required'
+        }
+      });
+    }
+
+    // Generate customer ID
+    const customerId = `CUST-${Date.now()}`;
+    const createdAt = new Date().toISOString();
+
+    // Mock response - in real implementation, this would insert into database
+    const newCustomer = {
+      customer_id: customerId,
+      customerId: customerId,
+      username: username,
+      email: email,
+      phone: phone || null,
+      first_name: firstName,
+      lastName: firstName,
+      last_name: lastName,
+      lastName: lastName,
+      date_of_birth: dateOfBirth || null,
+      address: address || null,
+      city: city || null,
+      state: state || null,
+      zip_code: zipCode || null,
+      country: country,
+      status: 'ACTIVE',
+      created_at: createdAt,
+      updated_at: createdAt,
+      last_login: null,
+      card_count: 0,
+      transaction_count: 0,
+      total_spent: 0.00
+    };
+
+    res.status(201).json({
+      success: true,
+      message: 'Customer created successfully',
+      data: newCustomer
+    });
+  } catch (error) {
+    console.error('Error creating customer:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred while creating the customer'
+      }
+    });
+  }
+});
+
+// Create customer with card (combined endpoint)
+router.post('/with-card', checkPermission('CREATE_CUSTOMERS'), async (req, res) => {
+  try {
+    const {
+      // Customer fields
+      username,
+      email,
+      phone,
+      firstName,
+      lastName,
+      dateOfBirth,
+      address,
+      city,
+      state,
+      zipCode,
+      country = 'US',
+      // Card fields
+      cardType = 'DEBIT',
+      cardBrand = 'VISA',
+      cardFormat = 'PHYSICAL',
+      isPrimary = true,
+      creditLimit = null,
+      expiryDate
+    } = req.body;
+
+    // Validate required fields
+    if (!username || !email || !firstName || !lastName) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_REQUIRED_FIELD',
+          message: 'username, email, firstName, and lastName are required'
+        }
+      });
+    }
+
+    // Generate customer ID
+    const customerId = `CUST-${Date.now()}`;
+    const createdAt = new Date().toISOString();
+
+    // Create customer object
+    const newCustomer = {
+      customer_id: customerId,
+      customerId: customerId,
+      username: username,
+      email: email,
+      phone: phone || null,
+      first_name: firstName,
+      lastName: firstName,
+      last_name: lastName,
+      lastName: lastName,
+      date_of_birth: dateOfBirth || null,
+      address: address || null,
+      city: city || null,
+      state: state || null,
+      zip_code: zipCode || null,
+      country: country,
+      status: 'ACTIVE',
+      created_at: createdAt,
+      updated_at: createdAt,
+      last_login: null,
+      card_count: 1,
+      transaction_count: 0,
+      total_spent: 0.00
+    };
+
+    // Generate card data
+    const cardId = `CARD-${Date.now()}`;
+    const cardNumber = cardType === 'CREDIT' ? '5555555555555678' : '4111111111111234';
+    const cardLastFour = cardNumber.slice(-4);
+    const issueDate = new Date().toISOString().split('T')[0];
+    const finalExpiryDate = expiryDate || new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    const newCard = {
+      card_id: cardId,
+      cardId: cardId,
+      customerId: customerId,
+      cardNumber: cardNumber,
+      cardLastFour: cardLastFour,
+      cardType: cardType,
+      cardBrand: cardBrand,
+      cardStatus: 'PENDING_ACTIVATION',
+      cardSubStatus: null,
+      customerName: `${firstName} ${lastName}`,
+      cardholderName: `${firstName} ${lastName}`,
+      issueDate: issueDate,
+      expiryDate: finalExpiryDate,
+      activationDate: null,
+      creditLimit: cardType === 'CREDIT' ? (creditLimit || 5000.00) : null,
+      availableCredit: cardType === 'CREDIT' ? (creditLimit || 5000.00) : null,
+      isPrimary: isPrimary,
+      cardFormat: cardFormat,
+      createdAt: createdAt,
+      updatedAt: createdAt,
+      customer: {
+        username: username,
+        email: email,
+        phone: phone || '+1234567890'
+      }
+    };
+
+    res.status(201).json({
+      success: true,
+      message: 'Customer and card created successfully',
+      data: {
+        customer: newCustomer,
+        card: newCard
+      }
+    });
+  } catch (error) {
+    console.error('Error creating customer with card:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred while creating the customer and card'
+      }
+    });
+  }
+});
+
 module.exports = router;
