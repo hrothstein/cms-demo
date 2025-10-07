@@ -23,7 +23,7 @@ const AdminLayout = () => {
     }
   }, [isAuthenticated, isLoading]);
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isLoading) {
     return null;
   }
 
