@@ -143,9 +143,12 @@ router.get('/profile', (req, res) => {
 // Admin profile endpoint
 router.get('/profile', async (req, res) => {
   try {
+    console.log('Profile endpoint hit');
     const authHeader = req.headers.authorization;
+    console.log('Auth header:', authHeader);
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('Missing or invalid auth header');
       return res.status(401).json({
         success: false,
         error: {
@@ -156,11 +159,14 @@ router.get('/profile', async (req, res) => {
     }
 
     const token = authHeader.substring(7);
+    console.log('Token:', token);
     
     // Verify admin JWT token
     const decoded = jwt.verify(token, process.env.ADMIN_JWT_SECRET || 'admin-demo-secret-key');
+    console.log('Decoded token:', decoded);
     
     if (decoded.type !== 'admin') {
+      console.log('Invalid token type:', decoded.type);
       return res.status(401).json({
         success: false,
         error: {
