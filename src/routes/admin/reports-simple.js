@@ -3,6 +3,43 @@ const { checkPermission } = require('../../middleware/rbac');
 
 const router = express.Router();
 
+// Get dashboard statistics
+router.get('/dashboard', checkPermission('GENERATE_REPORTS'), async (req, res) => {
+  try {
+    const mockStats = {
+      totalCards: 1247,
+      activeCards: 1189,
+      totalTransactions: 15420,
+      transactionVolume: 2847500.50,
+      criticalAlerts: 3,
+      totalCustomers: 892,
+      activeCustomers: 856,
+      thisWeekTransactions: 2340,
+      thisMonthTransactions: 15420,
+      thisWeekVolume: 456780.25,
+      thisMonthVolume: 2847500.50,
+      fraudAlerts: 3,
+      disputedTransactions: 12,
+      pendingApprovals: 8
+    };
+
+    res.json({
+      success: true,
+      data: mockStats
+    });
+
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred while fetching dashboard statistics'
+      }
+    });
+  }
+});
+
 // Get reports
 router.get('/', checkPermission('GENERATE_REPORTS'), async (req, res) => {
   try {
