@@ -386,126 +386,176 @@ app.get('/admin/reports/dashboard', (req, res) => {
   });
 });
 
-// Admin customers
-app.get('/admin/customers', (req, res) => {
-  res.json({
-    success: true,
-    data: [
-      {
-        id: 'CUST-001',
-        email: 'john.doe@example.com',
-        first_name: 'John',
-        last_name: 'Doe',
-        phone: '+1-555-0123',
-        status: 'ACTIVE',
-        created_at: '2024-01-15T10:30:00Z'
-      },
-      {
-        id: 'CUST-002',
-        email: 'jane.smith@example.com',
-        first_name: 'Jane',
-        last_name: 'Smith',
-        phone: '+1-555-0124',
-        status: 'ACTIVE',
-        created_at: '2024-01-16T14:20:00Z'
-      }
-    ]
-  });
-});
+    // Admin customers
+    app.get('/admin/customers', (req, res) => {
+      const customers = [
+        {
+          id: 'CUST-001',
+          email: 'john.doe@example.com',
+          first_name: 'John',
+          last_name: 'Doe',
+          phone: '+1-555-0123',
+          status: 'ACTIVE',
+          created_at: '2024-01-15T10:30:00Z'
+        },
+        {
+          id: 'CUST-002',
+          email: 'jane.smith@example.com',
+          first_name: 'Jane',
+          last_name: 'Smith',
+          phone: '+1-555-0124',
+          status: 'ACTIVE',
+          created_at: '2024-01-16T14:20:00Z'
+        }
+      ];
 
-// Admin cards
-app.get('/admin/cards', (req, res) => {
-  res.json({
-    success: true,
-    data: [
-      {
-        id: 'CARD-001',
-        customer_id: 'CUST-001',
-        card_number: '**** **** **** 1234',
-        card_type: 'DEBIT',
-        status: 'ACTIVE',
-        expiry_date: '12/25',
-        balance: 2500.00,
-        credit_limit: 5000.00
-      },
-      {
-        id: 'CARD-002',
-        customer_id: 'CUST-001',
-        card_number: '**** **** **** 5678',
-        card_type: 'CREDIT',
-        status: 'ACTIVE',
-        expiry_date: '08/26',
-        balance: 1200.00,
-        credit_limit: 10000.00
-      }
-    ]
-  });
-});
+      res.json({
+        success: true,
+        data: customers,
+        pagination: {
+          total: customers.length,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      });
+    });
 
-// Admin transactions
-app.get('/admin/transactions', (req, res) => {
-  res.json({
-    success: true,
-    data: [
-      {
-        id: 'TXN-001',
-        card_id: 'CARD-001',
-        customer_id: 'CUST-001',
-        amount: -45.50,
-        merchant: 'Starbucks Coffee',
-        date: '2024-01-15T10:30:00Z',
-        status: 'COMPLETED',
-        category: 'Food & Dining'
-      },
-      {
-        id: 'TXN-002',
-        card_id: 'CARD-001',
-        customer_id: 'CUST-001',
-        amount: -120.00,
-        merchant: 'Amazon',
-        date: '2024-01-14T15:45:00Z',
-        status: 'COMPLETED',
-        category: 'Shopping'
-      }
-    ]
-  });
-});
+    // Admin cards
+    app.get('/admin/cards', (req, res) => {
+      const cards = [
+        {
+          id: 'CARD-001',
+          customer_id: 'CUST-001',
+          card_number: '**** **** **** 1234',
+          card_type: 'DEBIT',
+          status: 'ACTIVE',
+          expiry_date: '12/25',
+          balance: 2500.00,
+          credit_limit: 5000.00
+        },
+        {
+          id: 'CARD-002',
+          customer_id: 'CUST-001',
+          card_number: '**** **** **** 5678',
+          card_type: 'CREDIT',
+          status: 'ACTIVE',
+          expiry_date: '08/26',
+          balance: 1200.00,
+          credit_limit: 10000.00
+        }
+      ];
 
-// Admin disputes
-app.get('/admin/disputes', (req, res) => {
-  res.json({
-    success: true,
-    data: [
-      {
-        id: 'DISPUTE-001',
-        customer_id: 'CUST-001',
-        transaction_id: 'TXN-001',
-        amount: 45.50,
-        reason: 'Unauthorized transaction',
-        status: 'PENDING',
-        created_at: '2024-01-15T11:00:00Z'
-      }
-    ]
-  });
-});
+      res.json({
+        success: true,
+        data: cards,
+        pagination: {
+          total: cards.length,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      });
+    });
 
-// Admin alerts
-app.get('/admin/alerts', (req, res) => {
-  res.json({
-    success: true,
-    data: [
-      {
-        id: 'ALERT-001',
-        type: 'FRAUD_DETECTED',
-        severity: 'HIGH',
-        message: 'Unusual spending pattern detected',
-        customer_id: 'CUST-001',
-        status: 'UNREAD',
-        created_at: '2024-01-15T12:00:00Z'
-      }
-    ]
-  });
-});
+    // Admin transactions
+    app.get('/admin/transactions', (req, res) => {
+      const transactions = [
+        {
+          id: 'TXN-001',
+          card_id: 'CARD-001',
+          customer_id: 'CUST-001',
+          amount: -45.50,
+          merchant: 'Starbucks Coffee',
+          date: '2024-01-15T10:30:00Z',
+          status: 'COMPLETED',
+          category: 'Food & Dining'
+        },
+        {
+          id: 'TXN-002',
+          card_id: 'CARD-001',
+          customer_id: 'CUST-001',
+          amount: -120.00,
+          merchant: 'Amazon',
+          date: '2024-01-14T15:45:00Z',
+          status: 'COMPLETED',
+          category: 'Shopping'
+        }
+      ];
+
+      res.json({
+        success: true,
+        data: transactions,
+        pagination: {
+          total: transactions.length,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      });
+    });
+
+    // Admin disputes
+    app.get('/admin/disputes', (req, res) => {
+      const disputes = [
+        {
+          id: 'DISPUTE-001',
+          customer_id: 'CUST-001',
+          transaction_id: 'TXN-001',
+          amount: 45.50,
+          reason: 'Unauthorized transaction',
+          status: 'PENDING',
+          created_at: '2024-01-15T11:00:00Z'
+        }
+      ];
+
+      res.json({
+        success: true,
+        data: disputes,
+        pagination: {
+          total: disputes.length,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      });
+    });
+
+    // Admin alerts
+    app.get('/admin/alerts', (req, res) => {
+      const alerts = [
+        {
+          id: 'ALERT-001',
+          type: 'FRAUD_DETECTED',
+          severity: 'HIGH',
+          message: 'Unusual spending pattern detected',
+          customer_id: 'CUST-001',
+          status: 'UNREAD',
+          created_at: '2024-01-15T12:00:00Z'
+        }
+      ];
+
+      res.json({
+        success: true,
+        data: alerts,
+        pagination: {
+          total: alerts.length,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      });
+    });
 
 // 404 handler
 app.use('*', (req, res) => {
