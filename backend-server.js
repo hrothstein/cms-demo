@@ -256,10 +256,17 @@ app.get('/admin/reports/dashboard', (req, res) => {
       totalDisputes: 45,
       pendingDisputes: 12,
       resolvedDisputes: 33,
+      openDisputes: 12,
       totalAlerts: 89,
       unreadAlerts: 23,
       totalRevenue: 125000.50,
       monthlyGrowth: 12.5,
+      // Additional fields that might be expected
+      transactionsToday: 234,
+      transactionVolumeToday: 12500.75,
+      cardsToday: 15,
+      disputesToday: 3,
+      alertsToday: 8,
       // Additional fields that might be expected
       todayTransactions: 234,
       todayRevenue: 12500.75,
