@@ -260,7 +260,25 @@ app.get('/admin/reports/dashboard', (req, res) => {
       totalAlerts: 89,
       unreadAlerts: 23,
       totalRevenue: 125000.50,
-      monthlyGrowth: 12.5
+      monthlyGrowth: 12.5,
+      // Additional fields that might be expected
+      todayTransactions: 234,
+      todayRevenue: 12500.75,
+      fraudAlerts: 5,
+      highRiskTransactions: 12,
+      cardReplacementRequests: 8,
+      customerServiceTickets: 45,
+      averageTransactionValue: 85.50,
+      topMerchants: [
+        { name: 'Amazon', count: 1250, amount: 45000.00 },
+        { name: 'Starbucks', count: 890, amount: 12000.50 },
+        { name: 'Target', count: 650, amount: 25000.75 }
+      ],
+      recentActivity: [
+        { type: 'CARD_BLOCKED', description: 'Card blocked due to suspicious activity', timestamp: '2024-01-15T14:30:00Z' },
+        { type: 'DISPUTE_FILED', description: 'New dispute filed for transaction', timestamp: '2024-01-15T13:45:00Z' },
+        { type: 'ALERT_TRIGGERED', description: 'High value transaction alert', timestamp: '2024-01-15T12:15:00Z' }
+      ]
     }
   });
 });
