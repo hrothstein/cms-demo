@@ -150,6 +150,8 @@ app.post('/api/v1/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     
+    console.log('Login attempt for:', username);
+    
     if (!username || !password) {
       return res.status(400).json({
         success: false,
@@ -167,7 +169,9 @@ app.post('/api/v1/auth/login', async (req, res) => {
       WHERE email = $1
     `;
     
+    console.log('Executing query:', userQuery, 'with params:', [username]);
     const result = await query(userQuery, [username]);
+    console.log('Query result:', result.rows);
     
     if (result.rows.length === 0) {
       return res.status(401).json({
@@ -180,6 +184,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
     }
 
     const user = result.rows[0];
+    console.log('User found:', user);
     
     // For demo purposes, check if password is 'Demo123!'
     // In production, use: const isValidPassword = await bcrypt.compare(password, user.password_hash);
@@ -206,6 +211,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
     );
     
+    console.log('Login successful for:', username);
     res.json({
       success: true,
       data: {
@@ -217,11 +223,14 @@ app.post('/api/v1/auth/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
+    console.error('Error details:', error.message);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       error: {
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'An error occurred during login'
+        message: 'An error occurred during login',
+        details: error.message
       }
     });
   }
