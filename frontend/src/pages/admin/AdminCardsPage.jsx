@@ -40,8 +40,8 @@ const AdminCardsPage = () => {
 
       const response = await adminApi.getCards(params);
       if (response.success) {
-        setCards(response.data.cards || []);
-        setPagination(response.data.pagination || { total: 0, limit: 20, offset: 0, pages: 1 });
+        setCards(response.data || []);
+        setPagination(response.pagination || { total: 0, limit: 20, offset: 0, pages: 1 });
       } else {
         setError(response.error?.message || 'Failed to fetch cards');
       }
