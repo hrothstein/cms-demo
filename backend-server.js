@@ -11,7 +11,8 @@ app.use(cors({
     'http://localhost:3000', 
     'http://localhost:8080', 
     'http://localhost:5173',
-    'https://cms-frontend-demo-6e5d83cad30d.herokuapp.com'
+    'https://cms-frontend-demo-6e5d83cad30d.herokuapp.com',
+    'https://cms-frontend-1759769376-89e39b75295e.herokuapp.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -182,6 +183,162 @@ app.post('/admin/login', (req, res) => {
       error: {
         code: 'INTERNAL_SERVER_ERROR',
         message: 'An error occurred during admin login',
+        details: error.message
+      }
+    });
+  }
+});
+
+// Demo cards data
+const demoCards = [
+  {
+    id: 'CARD-001',
+    customer_id: 'CUST-001',
+    card_number: '**** **** **** 1234',
+    card_type: 'DEBIT',
+    status: 'ACTIVE',
+    expiry_date: '12/25',
+    balance: 2500.00,
+    credit_limit: 5000.00,
+    last_four_digits: '1234'
+  },
+  {
+    id: 'CARD-002',
+    customer_id: 'CUST-001',
+    card_number: '**** **** **** 5678',
+    card_type: 'CREDIT',
+    status: 'ACTIVE',
+    expiry_date: '08/26',
+    balance: 1200.00,
+    credit_limit: 10000.00,
+    last_four_digits: '5678'
+  }
+];
+
+// Demo transactions data
+const demoTransactions = [
+  {
+    id: 'TXN-001',
+    card_id: 'CARD-001',
+    amount: -45.50,
+    merchant: 'Starbucks Coffee',
+    date: '2024-01-15T10:30:00Z',
+    status: 'COMPLETED',
+    category: 'Food & Dining'
+  },
+  {
+    id: 'TXN-002',
+    card_id: 'CARD-001',
+    amount: -120.00,
+    merchant: 'Amazon',
+    date: '2024-01-14T15:45:00Z',
+    status: 'COMPLETED',
+    category: 'Shopping'
+  }
+];
+
+// Cards endpoints
+app.get('/api/v1/cards', (req, res) => {
+  try {
+    console.log('Cards request received');
+    res.json({
+      success: true,
+      data: demoCards
+    });
+  } catch (error) {
+    console.error('Cards error:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred while fetching cards',
+        details: error.message
+      }
+    });
+  }
+});
+
+app.get('/api/v1/cards/:cardId', (req, res) => {
+  try {
+    const { cardId } = req.params;
+    console.log('Card detail request for:', cardId);
+    
+    const card = demoCards.find(c => c.id === cardId);
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'CARD_NOT_FOUND',
+          message: 'Card not found'
+        }
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: card
+    });
+  } catch (error) {
+    console.error('Card detail error:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred while fetching card details',
+        details: error.message
+      }
+    });
+  }
+});
+
+// Transactions endpoints
+app.get('/api/v1/transactions', (req, res) => {
+  try {
+    console.log('Transactions request received');
+    res.json({
+      success: true,
+      data: demoTransactions
+    });
+  } catch (error) {
+    console.error('Transactions error:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred while fetching transactions',
+        details: error.message
+      }
+    });
+  }
+});
+
+// Customer profile endpoint
+app.get('/api/v1/customers/profile', (req, res) => {
+  try {
+    console.log('Customer profile request received');
+    res.json({
+      success: true,
+      data: {
+        customer_id: 'CUST-001',
+        email: 'john.doe@example.com',
+        first_name: 'John',
+        last_name: 'Doe',
+        phone: '+1-555-0123',
+        address: {
+          street: '123 Main St',
+          city: 'San Francisco',
+          state: 'CA',
+          zip: '94105'
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Customer profile error:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred while fetching customer profile',
         details: error.message
       }
     });
