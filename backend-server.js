@@ -246,9 +246,8 @@ app.get('/admin/auth/profile', (req, res) => {
 
 // Admin dashboard stats
 app.get('/admin/reports/dashboard', (req, res) => {
-  res.json({
-    success: true,
-    data: {
+  console.log('Dashboard request received');
+  const dashboardData = {
       totalCustomers: 1250,
       totalCards: 3400,
       activeCards: 3200,
@@ -264,6 +263,23 @@ app.get('/admin/reports/dashboard', (req, res) => {
       // Additional fields that might be expected
       todayTransactions: 234,
       todayRevenue: 12500.75,
+      // Common dashboard fields that might be expected
+      totalAmount: 125000.50,
+      monthlyRevenue: 125000.50,
+      dailyRevenue: 12500.75,
+      weeklyRevenue: 87500.25,
+      yearlyRevenue: 1500000.00,
+      averageDailyTransactions: 234,
+      averageTransactionAmount: 85.50,
+      totalVolume: 125000.50,
+      revenue: 125000.50,
+      amount: 125000.50,
+      value: 125000.50,
+      // Ensure all numeric fields are properly defined
+      totalSpent: 125000.50,
+      totalEarned: 125000.50,
+      netRevenue: 125000.50,
+      grossRevenue: 125000.50,
       fraudAlerts: 5,
       highRiskTransactions: 12,
       cardReplacementRequests: 8,
@@ -279,7 +295,12 @@ app.get('/admin/reports/dashboard', (req, res) => {
         { type: 'DISPUTE_FILED', description: 'New dispute filed for transaction', timestamp: '2024-01-15T13:45:00Z' },
         { type: 'ALERT_TRIGGERED', description: 'High value transaction alert', timestamp: '2024-01-15T12:15:00Z' }
       ]
-    }
+    };
+  
+  console.log('Sending dashboard data:', JSON.stringify(dashboardData, null, 2));
+  res.json({
+    success: true,
+    data: dashboardData
   });
 });
 
