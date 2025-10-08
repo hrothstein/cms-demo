@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cms-backend-cards-fixed-8b8fe49bfe37.herokuapp.com/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cms-backend-cards-fixed-8b8fe49bfe37.herokuapp.com';
 
 class AdminApiService {
   constructor() {
