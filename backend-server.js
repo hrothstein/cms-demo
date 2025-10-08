@@ -426,6 +426,39 @@ app.get('/admin/reports/dashboard', (req, res) => {
       });
     });
 
+    // Admin customer detail
+    app.get('/admin/customers/:customerId', (req, res) => {
+      const { customerId } = req.params;
+      
+      // Mock customer data
+      const customer = {
+        id: customerId,
+        email: 'john.doe@example.com',
+        first_name: 'John',
+        last_name: 'Doe',
+        phone: '+1-555-0123',
+        status: 'ACTIVE',
+        created_at: '2024-01-15T10:30:00Z',
+        address: {
+          street: '123 Main St',
+          city: 'San Francisco',
+          state: 'CA',
+          zip: '94105'
+        },
+        kyc_status: 'VERIFIED',
+        risk_level: 'LOW',
+        total_cards: 2,
+        active_cards: 2,
+        total_transactions: 45,
+        total_spent: 1250.50
+      };
+
+      res.json({
+        success: true,
+        data: customer
+      });
+    });
+
     // Admin cards
     app.get('/admin/cards', (req, res) => {
       // Handle undefined parameters
@@ -465,6 +498,32 @@ app.get('/admin/reports/dashboard', (req, res) => {
           hasNext: false,
           hasPrev: false
         }
+      });
+    });
+
+    // Admin card detail
+    app.get('/admin/cards/:cardId', (req, res) => {
+      const { cardId } = req.params;
+      
+      const card = {
+        id: cardId,
+        customer_id: 'CUST-001',
+        card_number: '**** **** **** 1234',
+        full_card_number: '4111 1111 1111 1234',
+        card_type: 'DEBIT',
+        status: 'ACTIVE',
+        expiry_date: '12/25',
+        balance: 2500.00,
+        credit_limit: 5000.00,
+        created_at: '2024-01-15T10:30:00Z',
+        last_used: '2024-01-15T14:30:00Z',
+        daily_limit: 1000.00,
+        monthly_limit: 5000.00
+      };
+
+      res.json({
+        success: true,
+        data: card
       });
     });
 
@@ -510,6 +569,34 @@ app.get('/admin/reports/dashboard', (req, res) => {
       });
     });
 
+    // Admin transaction detail
+    app.get('/admin/transactions/:transactionId', (req, res) => {
+      const { transactionId } = req.params;
+      
+      const transaction = {
+        id: transactionId,
+        card_id: 'CARD-001',
+        customer_id: 'CUST-001',
+        amount: -45.50,
+        merchant: 'Starbucks Coffee',
+        merchant_category: 'Food & Dining',
+        date: '2024-01-15T10:30:00Z',
+        status: 'COMPLETED',
+        location: {
+          city: 'San Francisco',
+          state: 'CA',
+          country: 'US'
+        },
+        authorization_code: 'AUTH123456',
+        reference_number: 'REF789012'
+      };
+
+      res.json({
+        success: true,
+        data: transaction
+      });
+    });
+
     // Admin disputes
     app.get('/admin/disputes', (req, res) => {
       // Handle undefined parameters
@@ -541,6 +628,42 @@ app.get('/admin/reports/dashboard', (req, res) => {
       });
     });
 
+    // Admin dispute detail
+    app.get('/admin/disputes/:disputeId', (req, res) => {
+      const { disputeId } = req.params;
+      
+      const dispute = {
+        id: disputeId,
+        customer_id: 'CUST-001',
+        transaction_id: 'TXN-001',
+        amount: 45.50,
+        reason: 'Unauthorized transaction',
+        status: 'PENDING',
+        created_at: '2024-01-15T11:00:00Z',
+        description: 'Customer claims they did not make this purchase',
+        evidence: [
+          {
+            type: 'RECEIPT',
+            description: 'Customer receipt showing different amount',
+            uploaded_at: '2024-01-15T11:15:00Z'
+          }
+        ],
+        timeline: [
+          {
+            action: 'DISPUTE_CREATED',
+            timestamp: '2024-01-15T11:00:00Z',
+            user: 'john.doe@example.com',
+            note: 'Dispute filed by customer'
+          }
+        ]
+      };
+
+      res.json({
+        success: true,
+        data: dispute
+      });
+    });
+
     // Admin alerts
     app.get('/admin/alerts', (req, res) => {
       // Handle undefined parameters
@@ -569,6 +692,40 @@ app.get('/admin/reports/dashboard', (req, res) => {
           hasNext: false,
           hasPrev: false
         }
+      });
+    });
+
+    // Admin alert detail
+    app.get('/admin/alerts/:alertId', (req, res) => {
+      const { alertId } = req.params;
+      
+      const alert = {
+        id: alertId,
+        type: 'FRAUD_DETECTED',
+        severity: 'HIGH',
+        message: 'Unusual spending pattern detected',
+        customer_id: 'CUST-001',
+        status: 'UNREAD',
+        created_at: '2024-01-15T12:00:00Z',
+        details: {
+          threshold_exceeded: 'Daily spending limit',
+          amount: 500.00,
+          normal_average: 50.00,
+          location: 'San Francisco, CA',
+          merchant: 'Unknown merchant'
+        },
+        actions_taken: [
+          {
+            action: 'CARD_TEMPORARILY_BLOCKED',
+            timestamp: '2024-01-15T12:05:00Z',
+            user: 'system'
+          }
+        ]
+      };
+
+      res.json({
+        success: true,
+        data: alert
       });
     });
 
