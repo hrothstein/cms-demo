@@ -208,7 +208,7 @@ app.use('/api/v1/admin/notes', adminAuthMiddleware, adminNoteRoutes);
 app.use('/api/v1/admin/hbr-sync', adminAuthMiddleware, adminHbrSyncRoutes);
 
 // Authentication endpoint
-app.post('/api/v1/auth/login', async (req, res) => {
+app.post('/api/v1/auth/login', (req, res) => {
   try {
     const { username, password } = req.body;
     
