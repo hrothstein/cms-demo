@@ -260,6 +260,7 @@ app.get('/admin/reports/dashboard', (req, res) => {
       totalAlerts: 89,
       unreadAlerts: 23,
       criticalAlerts: 5,
+      unresolvedAlerts: 15,
       totalRevenue: 125000.50,
       monthlyGrowth: 12.5,
       // Additional fields that might be expected
