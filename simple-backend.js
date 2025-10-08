@@ -27,7 +27,7 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     version: '1.0.0',
     services: {
-      database: 'connected',
+      database: 'demo-mode',
       fraud_detection: 'active',
       notifications: 'active'
     }
