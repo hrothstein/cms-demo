@@ -20,9 +20,14 @@ class AdminApiService {
       ...options
     };
 
+    console.log('Admin API Request:', { url, config });
+
     try {
       const response = await fetch(url, config);
+      console.log('Admin API Response:', { status: response.status, statusText: response.statusText });
+      
       const data = await response.json();
+      console.log('Admin API Data:', data);
 
       if (!response.ok) {
         throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
