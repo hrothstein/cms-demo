@@ -394,20 +394,26 @@ app.get('/admin/reports/dashboard', (req, res) => {
       const customers = [
         {
           id: 'CUST-001',
+          customer_id: 'CUST-001',
           email: 'john.doe@example.com',
+          username: 'john.doe',
           first_name: 'John',
           last_name: 'Doe',
           phone: '+1-555-0123',
           status: 'ACTIVE',
+          account_status: 'ACTIVE',
           created_at: '2024-01-15T10:30:00Z'
         },
         {
           id: 'CUST-002',
+          customer_id: 'CUST-002',
           email: 'jane.smith@example.com',
+          username: 'jane.smith',
           first_name: 'Jane',
           last_name: 'Smith',
           phone: '+1-555-0124',
           status: 'ACTIVE',
+          account_status: 'ACTIVE',
           created_at: '2024-01-16T14:20:00Z'
         }
       ];
@@ -433,11 +439,14 @@ app.get('/admin/reports/dashboard', (req, res) => {
       // Mock customer data
       const customer = {
         id: customerId,
+        customer_id: customerId,
         email: 'john.doe@example.com',
+        username: 'john.doe',
         first_name: 'John',
         last_name: 'Doe',
         phone: '+1-555-0123',
         status: 'ACTIVE',
+        account_status: 'ACTIVE',
         created_at: '2024-01-15T10:30:00Z',
         address: {
           street: '123 Main St',
