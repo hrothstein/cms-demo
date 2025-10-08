@@ -227,6 +227,23 @@ app.get('/api/v1/customers/profile', (req, res) => {
   });
 });
 
+// Admin profile endpoint
+app.get('/admin/auth/profile', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      adminId: 'ADMIN-001',
+      username: 'admin',
+      email: 'admin@example.com',
+      firstName: 'Admin',
+      lastName: 'User',
+      role: 'ADMIN',
+      department: 'IT',
+      permissions: ['VIEW_CUSTOMERS', 'VIEW_CARDS', 'VIEW_FULL_CARD_NUMBER', 'LOCK_CARDS', 'UPDATE_CARD_CONTROLS', 'VIEW_TRANSACTIONS', 'VIEW_DISPUTES', 'UPDATE_DISPUTES', 'APPROVE_REFUNDS', 'VIEW_ALERTS', 'DISMISS_ALERTS', 'GENERATE_REPORTS', 'VIEW_AUDIT_LOGS', 'MANAGE_ADMIN_USERS', 'ADD_NOTES']
+    }
+  });
+});
+
 // Admin dashboard stats
 app.get('/admin/reports/dashboard', (req, res) => {
   res.json({
