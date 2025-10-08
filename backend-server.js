@@ -180,11 +180,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
     }
 
     // Query customer from database (check email)
-    const userQuery = `
-      SELECT customer_id, email, first_name, last_name, password_hash
-      FROM customers 
-      WHERE email = $1
-    `;
+    const userQuery = `SELECT customer_id, email, first_name, last_name, password_hash FROM customers WHERE email = $1`;
     
     console.log('Executing query:', userQuery, 'with params:', [username]);
     const result = await query(userQuery, [username]);
