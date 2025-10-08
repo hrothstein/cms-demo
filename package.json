@@ -1,17 +1,13 @@
 {
-  "name": "card-management-system",
+  "name": "cms-backend",
   "version": "1.0.0",
-  "description": "Card Management System demonstrating MuleSoft integration capabilities",
+  "description": "Card Management System Backend API",
   "main": "backend-server.js",
   "scripts": {
-    "dev:all": "concurrently \"npm run dev:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:db": "cd cms-database && npm run setup",
-    "dev:backend": "cd cms-backend && npm run dev",
-    "dev:frontend": "cd cms-frontend && npm run dev",
-    "build": "echo 'Build handled by Procfile'",
-    "start": "cd frontend && npm install && npm run build && npx serve -s dist -l $PORT",
-    "install:all": "npm install && cd cms-database && npm install && cd ../cms-backend && npm install && cd ../cms-frontend && npm install",
-    "setup": "npm run install:all && npm run dev:db"
+    "start": "node backend-server.js",
+    "dev": "nodemon backend-server.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -19,28 +15,27 @@
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",
     "dotenv": "^16.3.1",
-    "bcryptjs": "^2.4.3",
+    "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "joi": "^17.11.0",
     "express-rate-limit": "^7.1.5",
-    "compression": "^1.7.4",
-    "swagger-ui-express": "^5.0.0",
-    "swagger-jsdoc": "^6.2.8",
-    "yamljs": "^0.3.0"
+    "compression": "^1.7.4"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "@types/node": "^20.10.5",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/morgan": "^1.9.9",
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/pg": "^8.10.9",
+    "@types/compression": "^1.7.5"
   },
-  "keywords": [
-    "mulesoft",
-    "card-management",
-    "banking",
-    "api-led-connectivity",
-    "react",
-    "nodejs",
-    "postgresql"
-  ],
-  "author": "MuleSoft Solutions Engineering",
-  "license": "MIT"
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

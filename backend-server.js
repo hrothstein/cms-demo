@@ -162,12 +162,48 @@ const demoCards = [
 const demoTransactions = [
   {
     id: 'TXN-001',
+    transaction_id: 'TXN-001',
     card_id: 'CARD-001',
+    customer_id: 'CUST-001',
     amount: -45.50,
     merchant: 'Starbucks Coffee',
+    merchant_name: 'Starbucks Coffee',
+    customer_name: 'John Doe',
+    card_last_four: '1234',
     date: '2024-01-15T10:30:00Z',
     status: 'COMPLETED',
-    category: 'Food & Dining'
+    category: 'Food & Dining',
+    merchant_category: 'Food & Dining'
+  },
+  {
+    id: 'TXN-002',
+    transaction_id: 'TXN-002',
+    card_id: 'CARD-001',
+    customer_id: 'CUST-001',
+    amount: -120.00,
+    merchant: 'Amazon',
+    merchant_name: 'Amazon',
+    customer_name: 'John Doe',
+    card_last_four: '1234',
+    date: '2024-01-14T15:45:00Z',
+    status: 'COMPLETED',
+    category: 'Shopping',
+    merchant_category: 'Shopping'
+  },
+  {
+    id: 'TXN-003',
+    transaction_id: 'TXN-003',
+    card_id: 'CARD-002',
+    customer_id: 'CUST-002',
+    amount: -89.99,
+    merchant: 'Target',
+    merchant_name: 'Target',
+    customer_name: 'Jane Smith',
+    card_last_four: '5678',
+    date: '2024-01-13T09:15:00Z',
+    status: 'PENDING',
+    category: 'Shopping',
+    merchant_category: 'Shopping'
   }
 ];
 
@@ -544,23 +580,48 @@ app.get('/admin/reports/dashboard', (req, res) => {
       const transactions = [
         {
           id: 'TXN-001',
+          transaction_id: 'TXN-001',
           card_id: 'CARD-001',
           customer_id: 'CUST-001',
           amount: -45.50,
           merchant: 'Starbucks Coffee',
+          merchant_name: 'Starbucks Coffee',
+          customer_name: 'John Doe',
+          card_last_four: '1234',
           date: '2024-01-15T10:30:00Z',
           status: 'COMPLETED',
-          category: 'Food & Dining'
+          category: 'Food & Dining',
+          merchant_category: 'Food & Dining'
         },
         {
           id: 'TXN-002',
+          transaction_id: 'TXN-002',
           card_id: 'CARD-001',
           customer_id: 'CUST-001',
           amount: -120.00,
           merchant: 'Amazon',
+          merchant_name: 'Amazon',
+          customer_name: 'John Doe',
+          card_last_four: '1234',
           date: '2024-01-14T15:45:00Z',
           status: 'COMPLETED',
-          category: 'Shopping'
+          category: 'Shopping',
+          merchant_category: 'Shopping'
+        },
+        {
+          id: 'TXN-003',
+          transaction_id: 'TXN-003',
+          card_id: 'CARD-002',
+          customer_id: 'CUST-002',
+          amount: -89.99,
+          merchant: 'Target',
+          merchant_name: 'Target',
+          customer_name: 'Jane Smith',
+          card_last_four: '5678',
+          date: '2024-01-13T09:15:00Z',
+          status: 'PENDING',
+          category: 'Shopping',
+          merchant_category: 'Shopping'
         }
       ];
 
@@ -584,11 +645,16 @@ app.get('/admin/reports/dashboard', (req, res) => {
       
       const transaction = {
         id: transactionId,
+        transaction_id: transactionId,
         card_id: 'CARD-001',
         customer_id: 'CUST-001',
         amount: -45.50,
         merchant: 'Starbucks Coffee',
+        merchant_name: 'Starbucks Coffee',
+        customer_name: 'John Doe',
+        card_last_four: '1234',
         merchant_category: 'Food & Dining',
+        category: 'Food & Dining',
         date: '2024-01-15T10:30:00Z',
         status: 'COMPLETED',
         location: {

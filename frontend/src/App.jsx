@@ -17,11 +17,15 @@ import SettingsPage from './pages/SettingsPage'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminCustomersPage from './pages/admin/AdminCustomersPage'
+import AdminCustomerDetailPage from './pages/admin/AdminCustomerDetailPage'
 import AdminCardsPage from './pages/admin/AdminCardsPage'
 import AdminCardDetailPage from './pages/admin/AdminCardDetailPage'
 import AdminTransactionsPage from './pages/admin/AdminTransactionsPage'
+import AdminTransactionDetailPage from './pages/admin/AdminTransactionDetailPage'
 import AdminDisputesPage from './pages/admin/AdminDisputesPage'
+import AdminDisputeDetailPage from './pages/admin/AdminDisputeDetailPage'
 import AdminAlertsPage from './pages/admin/AdminAlertsPage'
+import AdminAlertDetailPage from './pages/admin/AdminAlertDetailPage'
 import AdminReportsPage from './pages/admin/AdminReportsPage'
 import AdminAuditLogsPage from './pages/admin/AdminAuditLogsPage'
 
@@ -84,11 +88,15 @@ function App() {
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="customers" element={<AdminCustomersPage />} />
+            <Route path="customers/:customerId" element={<AdminCustomerDetailPage />} />
             <Route path="cards" element={<AdminCardsPage />} />
             <Route path="cards/:cardId" element={<AdminCardDetailPage />} />
             <Route path="transactions" element={<AdminTransactionsPage />} />
+            <Route path="transactions/:transactionId" element={<AdminTransactionDetailPage />} />
             <Route path="disputes" element={<AdminDisputesPage />} />
+            <Route path="disputes/:disputeId" element={<AdminDisputeDetailPage />} />
             <Route path="alerts" element={<AdminAlertsPage />} />
+            <Route path="alerts/:alertId" element={<AdminAlertDetailPage />} />
             <Route path="reports" element={<AdminReportsPage />} />
             <Route path="audit-logs" element={<AdminAuditLogsPage />} />
           </Route>

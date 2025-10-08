@@ -17,6 +17,8 @@ class AdminApiService {
     const url = `${this.baseURL}${endpoint}`;
     const config = {
       headers: this.getAuthHeaders(),
+      mode: 'cors',
+      credentials: 'include',
       ...options
     };
 
