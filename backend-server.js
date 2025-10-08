@@ -557,6 +557,82 @@ app.get('/admin/reports/dashboard', (req, res) => {
       });
     });
 
+    // Admin reports
+    app.get('/admin/reports', (req, res) => {
+      const reports = [
+        {
+          id: 'REPORT-001',
+          name: 'Transaction Summary Report',
+          type: 'TRANSACTION_SUMMARY',
+          status: 'COMPLETED',
+          created_at: '2024-01-15T10:00:00Z',
+          generated_by: 'admin',
+          file_url: '/reports/transaction-summary-2024-01-15.pdf'
+        },
+        {
+          id: 'REPORT-002',
+          name: 'Fraud Analysis Report',
+          type: 'FRAUD_ANALYSIS',
+          status: 'COMPLETED',
+          created_at: '2024-01-14T15:30:00Z',
+          generated_by: 'admin',
+          file_url: '/reports/fraud-analysis-2024-01-14.pdf'
+        }
+      ];
+
+      res.json({
+        success: true,
+        data: reports,
+        pagination: {
+          total: reports.length,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      });
+    });
+
+    // Admin audit logs
+    app.get('/admin/audit-logs', (req, res) => {
+      const auditLogs = [
+        {
+          id: 'AUDIT-001',
+          action: 'CARD_LOCKED',
+          user: 'admin',
+          resource: 'CARD-001',
+          details: 'Card locked due to suspicious activity',
+          ip_address: '192.168.1.100',
+          user_agent: 'Mozilla/5.0...',
+          created_at: '2024-01-15T14:30:00Z'
+        },
+        {
+          id: 'AUDIT-002',
+          action: 'DISPUTE_CREATED',
+          user: 'john.doe@example.com',
+          resource: 'DISPUTE-001',
+          details: 'Customer filed dispute for unauthorized transaction',
+          ip_address: '192.168.1.101',
+          user_agent: 'Mozilla/5.0...',
+          created_at: '2024-01-15T13:45:00Z'
+        }
+      ];
+
+      res.json({
+        success: true,
+        data: auditLogs,
+        pagination: {
+          total: auditLogs.length,
+          page: 1,
+          limit: 50,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      });
+    });
+
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
