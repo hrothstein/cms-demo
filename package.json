@@ -2,15 +2,32 @@
   "name": "card-management-system",
   "version": "1.0.0",
   "description": "Card Management System demonstrating MuleSoft integration capabilities",
+  "main": "backend-server.js",
   "scripts": {
     "dev:all": "concurrently \"npm run dev:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:db": "cd cms-database && npm run setup",
     "dev:backend": "cd cms-backend && npm run dev",
     "dev:frontend": "cd cms-frontend && npm run dev",
     "build": "cd cms-frontend && npm run build",
-    "start": "cd cms-backend && npm start",
+    "start": "node backend-server.js",
     "install:all": "npm install && cd cms-database && npm install && cd ../cms-backend && npm install && cd ../cms-frontend && npm install",
     "setup": "npm run install:all && npm run dev:db"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "joi": "^17.11.0",
+    "express-rate-limit": "^7.1.5",
+    "compression": "^1.7.4",
+    "swagger-ui-express": "^5.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
