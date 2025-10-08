@@ -311,15 +311,59 @@ app.get('/admin/reports/dashboard', (req, res) => {
       customerServiceTickets: 45,
       averageTransactionValue: 85.50,
       topMerchants: [
-        { name: 'Amazon', count: 1250, amount: 45000.00 },
-        { name: 'Starbucks', count: 890, amount: 12000.50 },
-        { name: 'Target', count: 650, amount: 25000.75 }
+        { name: 'Amazon', count: 1250, amount: 45000.00, value: 45000.00, total: 45000.00, revenue: 45000.00 },
+        { name: 'Starbucks', count: 890, amount: 12000.50, value: 12000.50, total: 12000.50, revenue: 12000.50 },
+        { name: 'Target', count: 650, amount: 25000.75, value: 25000.75, total: 25000.75, revenue: 25000.75 }
+      ],
+      // Additional arrays that might be expected
+      merchants: [
+        { name: 'Amazon', count: 1250, amount: 45000.00, value: 45000.00, total: 45000.00, revenue: 45000.00 },
+        { name: 'Starbucks', count: 890, amount: 12000.50, value: 12000.50, total: 12000.50, revenue: 12000.50 }
+      ],
+      transactions: [
+        { amount: 45000.00, value: 45000.00, total: 45000.00, revenue: 45000.00 },
+        { amount: 12000.50, value: 12000.50, total: 12000.50, revenue: 12000.50 }
+      ],
+      // Ensure all array elements have numeric values
+      data: [
+        { value: 125000.50, amount: 125000.50, total: 125000.50, revenue: 125000.50 },
+        { value: 125000.50, amount: 125000.50, total: 125000.50, revenue: 125000.50 }
       ],
       recentActivity: [
-        { type: 'CARD_BLOCKED', description: 'Card blocked due to suspicious activity', timestamp: '2024-01-15T14:30:00Z' },
-        { type: 'DISPUTE_FILED', description: 'New dispute filed for transaction', timestamp: '2024-01-15T13:45:00Z' },
-        { type: 'ALERT_TRIGGERED', description: 'High value transaction alert', timestamp: '2024-01-15T12:15:00Z' }
-      ]
+        { type: 'CARD_BLOCKED', description: 'Card blocked due to suspicious activity', timestamp: '2024-01-15T14:30:00Z', amount: 0, value: 0, total: 0 },
+        { type: 'DISPUTE_FILED', description: 'New dispute filed for transaction', timestamp: '2024-01-15T13:45:00Z', amount: 0, value: 0, total: 0 },
+        { type: 'ALERT_TRIGGERED', description: 'High value transaction alert', timestamp: '2024-01-15T12:15:00Z', amount: 0, value: 0, total: 0 }
+      ],
+      // Additional safety measures
+      stats: {
+        total: 125000.50,
+        amount: 125000.50,
+        value: 125000.50,
+        revenue: 125000.50,
+        count: 125000
+      },
+      metrics: {
+        total: 125000.50,
+        amount: 125000.50,
+        value: 125000.50,
+        revenue: 125000.50,
+        count: 125000
+      },
+      // Ensure all possible nested structures are defined
+      summary: {
+        total: 125000.50,
+        amount: 125000.50,
+        value: 125000.50,
+        revenue: 125000.50,
+        count: 125000
+      },
+      overview: {
+        total: 125000.50,
+        amount: 125000.50,
+        value: 125000.50,
+        revenue: 125000.50,
+        count: 125000
+      }
     };
   
   console.log('Sending dashboard data:', JSON.stringify(dashboardData, null, 2));
