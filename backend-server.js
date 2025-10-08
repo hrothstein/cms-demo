@@ -388,6 +388,9 @@ app.get('/admin/reports/dashboard', (req, res) => {
 
     // Admin customers
     app.get('/admin/customers', (req, res) => {
+      // Handle undefined parameters
+      const { limit = 10, offset = 0, search, status } = req.query;
+      
       const customers = [
         {
           id: 'CUST-001',
@@ -425,6 +428,9 @@ app.get('/admin/reports/dashboard', (req, res) => {
 
     // Admin cards
     app.get('/admin/cards', (req, res) => {
+      // Handle undefined parameters
+      const { limit = 10, offset = 0, status, cardType } = req.query;
+      
       const cards = [
         {
           id: 'CARD-001',
@@ -464,6 +470,9 @@ app.get('/admin/reports/dashboard', (req, res) => {
 
     // Admin transactions
     app.get('/admin/transactions', (req, res) => {
+      // Handle undefined parameters
+      const { limit = 10, offset = 0, dateRange, status, search } = req.query;
+      
       const transactions = [
         {
           id: 'TXN-001',
@@ -503,6 +512,9 @@ app.get('/admin/reports/dashboard', (req, res) => {
 
     // Admin disputes
     app.get('/admin/disputes', (req, res) => {
+      // Handle undefined parameters
+      const { limit = 10, offset = 0, status, type, dateRange, search } = req.query;
+      
       const disputes = [
         {
           id: 'DISPUTE-001',
@@ -531,6 +543,9 @@ app.get('/admin/reports/dashboard', (req, res) => {
 
     // Admin alerts
     app.get('/admin/alerts', (req, res) => {
+      // Handle undefined parameters
+      const { limit = 10, offset = 0, severity, type, status, search } = req.query;
+      
       const alerts = [
         {
           id: 'ALERT-001',
@@ -559,6 +574,9 @@ app.get('/admin/reports/dashboard', (req, res) => {
 
     // Admin reports
     app.get('/admin/reports', (req, res) => {
+      // Handle undefined parameters
+      const { limit = 10, offset = 0, start, end, type } = req.query;
+      
       const reports = [
         {
           id: 'REPORT-001',
@@ -596,6 +614,9 @@ app.get('/admin/reports/dashboard', (req, res) => {
 
     // Admin audit logs
     app.get('/admin/audit-logs', (req, res) => {
+      // Handle undefined parameters
+      const { limit = 50, offset = 0, action, user, resource, dateRange, search, page = 1 } = req.query;
+      
       const auditLogs = [
         {
           id: 'AUDIT-001',
