@@ -270,6 +270,43 @@ app.post('/api/v1/admin/auth/login', (req, res) => {
   }
 });
 
+// Simple admin test endpoint
+app.post('/api/v1/admin/test-login', (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (username === 'admin' && password === 'admin123') {
+      res.json({
+        success: true,
+        message: 'Admin login test successful!',
+        admin: {
+          adminId: 'ADMIN-001',
+          username: 'admin',
+          role: 'ADMIN',
+          department: 'IT'
+        }
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid username or password'
+        }
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred during admin login test',
+        details: error.message
+      }
+    });
+  }
+});
+
 // API routes
 app.use('/api/v1/cards', authMiddleware, cardRoutes);
 app.use('/api/v1/transactions', authMiddleware, transactionRoutes);
