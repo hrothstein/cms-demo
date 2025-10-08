@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // Create axios instance
-const baseURL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://cms-backend-demo-34753a198a67.herokuapp.com/api/v1' : '/api/v1');
+const baseURL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://cms-backend-cards-fixed-8b8fe49bfe37.herokuapp.com/api/v1' : '/api/v1');
 
 console.log('API Client baseURL:', baseURL);
 console.log('Environment:', import.meta.env.PROD ? 'production' : 'development');
