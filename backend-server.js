@@ -151,6 +151,43 @@ app.get('/test', (req, res) => {
   });
 });
 
+// Simple login test endpoint
+app.post('/api/v1/auth/test-login', (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (username === 'sarah.demo@example.com' && password === 'Demo123!') {
+      res.json({
+        success: true,
+        message: 'Login test successful!',
+        user: {
+          customerId: 'CUST-001',
+          email: 'sarah.demo@example.com',
+          firstName: 'Sarah',
+          lastName: 'Johnson'
+        }
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid username or password'
+        }
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred during login test',
+        details: error.message
+      }
+    });
+  }
+});
+
 // API routes
 app.use('/api/v1/cards', authMiddleware, cardRoutes);
 app.use('/api/v1/transactions', authMiddleware, transactionRoutes);
