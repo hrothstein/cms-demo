@@ -225,13 +225,17 @@ app.post('/api/v1/auth/login', (req, res) => {
     }
 
     // For demo purposes, hardcode the user data
-    if (username === 'sarah.demo@example.com' && password === 'Demo123!') {
-      const user = {
-        customer_id: 'CUST-001',
-        email: 'sarah.demo@example.com',
-        first_name: 'Sarah',
-        last_name: 'Johnson'
-      };
+    const demoUsers = {
+      'john.doe@example.com': { customer_id: 'CUST-001', email: 'john.doe@example.com', first_name: 'John', last_name: 'Doe' },
+      'jane.smith@example.com': { customer_id: 'CUST-002', email: 'jane.smith@example.com', first_name: 'Jane', last_name: 'Smith' },
+      'bob.johnson@example.com': { customer_id: 'CUST-003', email: 'bob.johnson@example.com', first_name: 'Bob', last_name: 'Johnson' },
+      'john.doe': { customer_id: 'CUST-001', email: 'john.doe@example.com', first_name: 'John', last_name: 'Doe' },
+      'jane.smith': { customer_id: 'CUST-002', email: 'jane.smith@example.com', first_name: 'Jane', last_name: 'Smith' },
+      'bob.johnson': { customer_id: 'CUST-003', email: 'bob.johnson@example.com', first_name: 'Bob', last_name: 'Johnson' }
+    };
+    
+    if (demoUsers[username] && password === 'demo123') {
+      const user = demoUsers[username];
       
       console.log('Demo user found:', user);
       
