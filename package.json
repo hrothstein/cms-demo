@@ -8,7 +8,7 @@
     "dev:db": "cd cms-database && npm run setup",
     "dev:backend": "cd cms-backend && npm run dev",
     "dev:frontend": "cd cms-frontend && npm run dev",
-    "build": "cd frontend && npm run build",
+    "build": "echo 'Build handled by Procfile'",
     "start": "node backend-server.js",
     "install:all": "npm install && cd cms-database && npm install && cd ../cms-backend && npm install && cd ../cms-frontend && npm install",
     "setup": "npm run install:all && npm run dev:db"
