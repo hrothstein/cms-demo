@@ -307,6 +307,88 @@ app.post('/api/v1/admin/test-login', (req, res) => {
   }
 });
 
+// Admin login endpoint for frontend
+app.post('/admin/login', (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    console.log('Admin login attempt for:', username);
+    
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_CREDENTIALS',
+          message: 'Username and password are required'
+        }
+      });
+    }
+
+    // For demo purposes, hardcode the admin user
+    if (username === 'admin' && password === 'admin123') {
+      const admin = {
+        admin_id: 'ADMIN-001',
+        username: 'admin',
+        email: 'admin@example.com',
+        first_name: 'Admin',
+        last_name: 'User',
+        role: 'ADMIN',
+        department: 'IT'
+      };
+      
+      console.log('Demo admin found:', admin);
+      
+      // Generate admin JWT token
+      const token = jwt.sign(
+        { 
+          adminId: admin.admin_id,
+          username: admin.username,
+          role: admin.role,
+          type: 'admin' 
+        },
+        process.env.ADMIN_JWT_SECRET || 'admin-demo-secret-key',
+        { expiresIn: process.env.ADMIN_JWT_EXPIRES_IN || '1h' }
+      );
+      
+      console.log('Admin login successful for:', username);
+      return res.json({
+        success: true,
+        data: {
+          token,
+          adminId: admin.admin_id,
+          username: admin.username,
+          firstName: admin.first_name,
+          lastName: admin.last_name,
+          role: admin.role,
+          department: admin.department,
+          permissions: ['VIEW_CUSTOMERS', 'VIEW_CARDS', 'VIEW_FULL_CARD_NUMBER', 'LOCK_CARDS', 'UPDATE_CARD_CONTROLS', 'VIEW_TRANSACTIONS', 'VIEW_DISPUTES', 'UPDATE_DISPUTES', 'APPROVE_REFUNDS', 'VIEW_ALERTS', 'DISMISS_ALERTS', 'GENERATE_REPORTS', 'VIEW_AUDIT_LOGS', 'MANAGE_ADMIN_USERS', 'ADD_NOTES'],
+          expiresIn: process.env.ADMIN_JWT_EXPIRES_IN || '1h'
+        }
+      });
+    }
+    
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'INVALID_CREDENTIALS',
+        message: 'Invalid username or password'
+      }
+    });
+  } catch (error) {
+    console.error('Admin login error:', error);
+    console.error('Error details:', error.message);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An error occurred during admin login',
+        details: error.message
+      }
+    });
+  }
+});
+
 // API routes
 app.use('/api/v1/cards', authMiddleware, cardRoutes);
 app.use('/api/v1/transactions', authMiddleware, transactionRoutes);
