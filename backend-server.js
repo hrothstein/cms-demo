@@ -143,6 +143,14 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Simple test endpoint
+app.get('/test', (req, res) => {
+  res.json({
+    message: 'Backend is working!',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // API routes
 app.use('/api/v1/cards', authMiddleware, cardRoutes);
 app.use('/api/v1/transactions', authMiddleware, transactionRoutes);
