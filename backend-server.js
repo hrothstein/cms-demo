@@ -113,17 +113,34 @@ const adminApiSpec = YAML.load('./src/swagger/admin-api.yaml');
 app.use('/admin-api-docs', swaggerUi.serve, swaggerUi.setup(adminApiSpec));
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    services: {
-      database: 'connected',
-      fraud_detection: 'active',
-      notifications: 'active'
-    }
-  });
+app.get('/health', async (req, res) => {
+  try {
+    // Test database connection
+    const dbResult = await query('SELECT 1 as test');
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      services: {
+        database: 'connected',
+        fraud_detection: 'active',
+        notifications: 'active'
+      },
+      database_test: dbResult.rows[0]
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      services: {
+        database: 'disconnected',
+        fraud_detection: 'active',
+        notifications: 'active'
+      },
+      error: error.message
+    });
+  }
 });
 
 // API routes
