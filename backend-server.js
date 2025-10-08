@@ -269,6 +269,10 @@ app.get('/admin/reports/dashboard', (req, res) => {
       cardsToday: 15,
       disputesToday: 3,
       alertsToday: 8,
+      // Additional fields from frontend analysis
+      transactionsThisWeek: 1250,
+      transactionsThisMonth: 5600,
+      lockedCards: 200,
       // Additional fields that might be expected
       todayTransactions: 234,
       todayRevenue: 12500.75,
