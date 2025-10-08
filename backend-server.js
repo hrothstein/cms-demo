@@ -47,7 +47,8 @@ app.use(cors({
     'http://localhost:3000', 
     'http://localhost:8080', 
     'http://localhost:5173',
-    'https://cms-frontend-1759769376-89e39b75295e.herokuapp.com'
+    'https://cms-frontend-1759769376-89e39b75295e.herokuapp.com',
+    'https://cms-frontend-demo-6e5d83cad30d.herokuapp.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -159,11 +160,11 @@ app.post('/api/v1/auth/login', async (req, res) => {
       });
     }
 
-    // Query user from database (check both username and email)
+    // Query customer from database (check email)
     const userQuery = `
-      SELECT user_id, customer_id, username, password_hash, email, phone, is_active
-      FROM users 
-      WHERE (username = $1 OR email = $1) AND is_active = true
+      SELECT customer_id, email, first_name, last_name, password_hash
+      FROM customers 
+      WHERE email = $1
     `;
     
     const result = await query(userQuery, [username]);
@@ -180,9 +181,9 @@ app.post('/api/v1/auth/login', async (req, res) => {
 
     const user = result.rows[0];
     
-    // For demo purposes, check if password is 'demo123'
+    // For demo purposes, check if password is 'Demo123!'
     // In production, use: const isValidPassword = await bcrypt.compare(password, user.password_hash);
-    const isValidPassword = password === 'demo123';
+    const isValidPassword = password === 'Demo123!';
     
     if (!isValidPassword) {
       return res.status(401).json({
@@ -194,17 +195,11 @@ app.post('/api/v1/auth/login', async (req, res) => {
       });
     }
 
-    // Update last login
-    await query(
-      'UPDATE users SET last_login = $1 WHERE user_id = $2',
-      [new Date().toISOString(), user.user_id]
-    );
-
     // Generate JWT token
     const token = jwt.sign(
       { 
         customerId: user.customer_id, 
-        username: user.username,
+        email: user.email,
         type: 'customer' 
       },
       process.env.JWT_SECRET || 'demo-secret-key',
@@ -216,7 +211,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
       data: {
         token,
         customerId: user.customer_id,
-        username: user.username,
+        email: user.email,
         expiresIn: process.env.JWT_EXPIRES_IN || '1h'
       }
     });
