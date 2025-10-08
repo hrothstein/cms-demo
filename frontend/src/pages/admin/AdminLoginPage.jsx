@@ -141,10 +141,7 @@ const AdminLoginPage = () => {
             </div>
             
             <div className="mt-4 text-xs text-gray-500 space-y-1">
-              <div><strong>CSR:</strong> john.csr / admin123</div>
-              <div><strong>Fraud Analyst:</strong> fraud.analyst / admin123</div>
-              <div><strong>Supervisor:</strong> supervisor.jane / admin123</div>
-              <div><strong>Admin:</strong> admin.user / admin123</div>
+              <div><strong>Admin:</strong> admin / admin123</div>
             </div>
           </div>
         </form>

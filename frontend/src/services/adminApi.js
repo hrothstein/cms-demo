@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cms-backend-1759769281-c3f75c1b055e.herokuapp.com/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cms-backend-cards-fixed-8b8fe49bfe37.herokuapp.com/api/v1';
 
 class AdminApiService {
   constructor() {
@@ -37,7 +37,7 @@ class AdminApiService {
 
   // Authentication
   async login(credentials) {
-    return this.request('/admin/auth/login', {
+    return this.request('/admin/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
     });
