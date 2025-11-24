@@ -4,7 +4,7 @@
  */
 
 const { query } = require('../../config/database');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 // ========================================
 // Customer Management Handlers
@@ -30,8 +30,7 @@ async function cms_get_customers(args) {
     searchConditions.push(`(
       u.customer_id ILIKE $${paramCount} OR 
       u.username ILIKE $${paramCount} OR 
-      u.email ILIKE $${paramCount} OR
-      CONCAT(u.first_name, ' ', u.last_name) ILIKE $${paramCount}
+      u.email ILIKE $${paramCount}
     )`);
     queryParams.push(`%${search}%`);
   }
@@ -64,8 +63,6 @@ async function cms_get_customers(args) {
       u.username,
       u.email,
       u.phone,
-      u.first_name,
-      u.last_name,
       u.is_active as account_status,
       u.created_at,
       u.last_login,
@@ -113,15 +110,6 @@ async function cms_get_customer(args) {
       u.username,
       u.email,
       u.phone,
-      u.first_name,
-      u.last_name,
-      u.date_of_birth,
-      u.address_line1,
-      u.address_line2,
-      u.city,
-      u.state,
-      u.postal_code,
-      u.country,
       u.is_active,
       u.created_at,
       u.updated_at,
@@ -154,42 +142,27 @@ async function cms_create_customer(args) {
     email,
     password,
     phone,
-    first_name,
-    last_name,
-    date_of_birth,
-    address_line1,
-    address_line2,
-    city,
-    state,
-    postal_code,
-    country = 'US',
   } = args;
+
+  // Generate customer_id
+  const customer_id = 'CUST-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
   // Hash password
   const password_hash = await bcrypt.hash(password, 10);
 
   const insertQuery = `
     INSERT INTO users (
-      username, email, password_hash, phone, first_name, last_name,
-      date_of_birth, address_line1, address_line2, city, state, postal_code, country
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-    RETURNING customer_id, username, email, phone, first_name, last_name, created_at
+      customer_id, username, email, password_hash, phone
+    ) VALUES ($1, $2, $3, $4, $5)
+    RETURNING customer_id, username, email, phone, created_at
   `;
 
   const result = await query(insertQuery, [
+    customer_id,
     username,
     email,
     password_hash,
     phone,
-    first_name,
-    last_name,
-    date_of_birth,
-    address_line1,
-    address_line2,
-    city,
-    state,
-    postal_code,
-    country,
   ]);
 
   return {
@@ -270,12 +243,11 @@ async function cms_search_customers(args) {
 
   const searchSql = `
     SELECT 
-      customer_id, username, email, first_name, last_name, phone, created_at
+      customer_id, username, email, phone, created_at
     FROM users
     WHERE (
       username ILIKE $1 OR
-      email ILIKE $1 OR
-      CONCAT(first_name, ' ', last_name) ILIKE $1
+      email ILIKE $1
     )
     AND is_active = true
     ORDER BY created_at DESC
@@ -561,34 +533,78 @@ async function cms_unlock_card(args) {
 async function cms_update_card_controls(args) {
   const { card_id, ...controls } = args;
 
-  // Get current card controls
-  const getControlsQuery = `
-    SELECT card_controls FROM cards WHERE card_id = $1
-  `;
-
-  const currentResult = await query(getControlsQuery, [card_id]);
-
-  if (currentResult.rows.length === 0) {
+  // Check if card exists
+  const checkCard = await query('SELECT card_id FROM cards WHERE card_id = $1', [card_id]);
+  if (checkCard.rows.length === 0) {
     throw new Error(`Card with ID ${card_id} not found`);
   }
 
-  const currentControls = currentResult.rows[0].card_controls || {};
-  const updatedControls = { ...currentControls, ...controls };
+  // Check if controls record exists
+  const existingControls = await query('SELECT * FROM card_controls WHERE card_id = $1', [card_id]);
 
-  const updateQuery = `
-    UPDATE cards
-    SET card_controls = $2, updated_at = CURRENT_TIMESTAMP
-    WHERE card_id = $1
-    RETURNING card_id, card_controls, updated_at
-  `;
+  if (existingControls.rows.length === 0) {
+    // Insert new controls
+    const insertQuery = `
+      INSERT INTO card_controls (
+        card_id, daily_limit, per_transaction_limit, contactless_enabled, 
+        online_enabled, international_enabled, atm_enabled
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *
+    `;
+    const result = await query(insertQuery, [
+      card_id,
+      controls.daily_limit || null,
+      controls.transaction_limit || null,
+      controls.contactless_enabled !== undefined ? controls.contactless_enabled : true,
+      controls.online_enabled !== undefined ? controls.online_enabled : true,
+      controls.international_enabled !== undefined ? controls.international_enabled : false,
+      controls.atm_enabled !== undefined ? controls.atm_enabled : true,
+    ]);
+    return {
+      success: true,
+      message: 'Card controls created successfully',
+      controls: result.rows[0],
+    };
+  } else {
+    // Update existing controls
+    const updateFields = [];
+    const values = [card_id];
+    let paramCount = 1;
 
-  const result = await query(updateQuery, [card_id, JSON.stringify(updatedControls)]);
+    Object.keys(controls).forEach((key) => {
+      if (controls[key] !== undefined) {
+        paramCount++;
+        const dbKey = key === 'transaction_limit' ? 'per_transaction_limit' : key;
+        updateFields.push(`${dbKey} = $${paramCount}`);
+        values.push(controls[key]);
+      }
+    });
 
-  return {
-    success: true,
-    message: 'Card controls updated successfully',
-    card: result.rows[0],
-  };
+    if (updateFields.length === 0) {
+      return {
+        success: true,
+        message: 'No changes made',
+        controls: existingControls.rows[0],
+      };
+    }
+
+    paramCount++;
+    updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
+
+    const updateQuery = `
+      UPDATE card_controls
+      SET ${updateFields.join(', ')}
+      WHERE card_id = $1
+      RETURNING *
+    `;
+
+    const result = await query(updateQuery, values);
+    return {
+      success: true,
+      message: 'Card controls updated successfully',
+      controls: result.rows[0],
+    };
+  }
 }
 
 // ========================================
