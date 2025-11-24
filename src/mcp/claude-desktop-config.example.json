@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "cms-admin": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/cms-demo/src/mcp/index.js"
+      ],
+      "env": {
+        "DATABASE_URL": "postgresql://username:password@localhost:5432/cms_database",
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
+

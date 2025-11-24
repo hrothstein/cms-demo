@@ -45,6 +45,60 @@ The Card Management System is a modern, full-stack web application that demonstr
 - **Security**: JWT authentication, rate limiting, audit logging
 - **Responsive Design**: Mobile-first UI that works on all devices
 - **MuleSoft Integration**: Simulated integration points for demo purposes
+- **🤖 AI Agent Integration**: MCP Server enables Claude and other AI agents to interact with the CMS (30+ tools)
+
+## 🤖 AI Agent Integration (MCP Server)
+
+The CMS includes a **Model Context Protocol (MCP) Server** that enables AI agents like Claude to interact directly with the Card Management System. This provides 30+ tools for customer management, card operations, transactions, alerts, disputes, and card services.
+
+### MCP Features
+- **Customer Management**: Create, read, update, delete customers
+- **Card Operations**: Lock/unlock cards, update controls, manage lifecycle
+- **Transactions**: View and search transaction history
+- **Disputes**: Submit and track transaction disputes
+- **Alerts**: Manage notifications and preferences
+- **Card Services**: PIN management, activation, replacements
+
+### Setup MCP with Claude Desktop
+
+1. Install dependencies (already included):
+```bash
+npm install @modelcontextprotocol/sdk
+```
+
+2. Configure Claude Desktop by editing your config file:
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+3. Add MCP server configuration:
+```json
+{
+  "mcpServers": {
+    "cms-admin": {
+      "command": "node",
+      "args": ["/absolute/path/to/cms-demo/src/mcp/index.js"],
+      "env": {
+        "DATABASE_URL": "postgresql://username:password@localhost:5432/cms_database"
+      }
+    }
+  }
+}
+```
+
+4. Restart Claude Desktop
+
+### Using MCP with Claude
+
+Once configured, interact with the CMS through natural language:
+
+```
+"Find all customers with active cards"
+"Lock card ending in 1234 due to suspected fraud"
+"Show recent transactions for customer john.demo@example.com"
+"Create a dispute for transaction ID xyz-123"
+```
+
+**📖 Full MCP Documentation**: See [MCP_SERVER_README.md](./MCP_SERVER_README.md)
 
 ## 🚀 Quick Start
 
