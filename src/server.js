@@ -7,7 +7,7 @@ const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const YAML = require('yamljs');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 // Import database connection
