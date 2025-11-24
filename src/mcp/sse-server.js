@@ -1,6 +1,6 @@
 /**
- * MCP Server with SSE Transport
- * Supports Server-Sent Events for real MCP protocol communication
+ * MCP Server with SSE Transport for MCP Protocol
+ * Properly implements SSE transport according to MCP SDK specification
  */
 
 require('dotenv').config();
@@ -36,59 +36,8 @@ const allTools = [
   ...cardServiceTools,
 ];
 
-// Create MCP server instance
-const mcpServer = new Server(
-  {
-    name: 'cms-admin-mcp-server',
-    version: '1.0.0',
-  },
-  {
-    capabilities: {
-      tools: {},
-    },
-  }
-);
-
-// Setup MCP handlers
-mcpServer.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: allTools,
-}));
-
-mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
-
-  try {
-    const handler = handlers[name];
-    if (!handler) {
-      throw new Error(`Unknown tool: ${name}`);
-    }
-
-    const result = await handler(args);
-
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(result, null, 2),
-        },
-      ],
-    };
-  } catch (error) {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-          }, null, 2),
-        },
-      ],
-      isError: true,
-    };
-  }
-});
+// Store active transports by sessionId
+const activeSessions = new Map();
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -97,125 +46,10 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     message: 'MCP SSE Server is running',
     toolsAvailable: allTools.length,
+    activeSessions: activeSessions.size,
     transport: 'SSE',
     timestamp: new Date().toISOString(),
   });
-});
-
-// Store active servers by session ID (each connection gets its own server instance)
-const activeSessions = new Map();
-
-// MCP SSE endpoint
-app.get('/sse', async (req, res) => {
-  console.log('📡 New SSE connection established');
-
-  // Create a new MCP server instance for this connection
-  const sessionServer = new Server(
-    {
-      name: 'cms-admin-mcp-server',
-      version: '1.0.0',
-    },
-    {
-      capabilities: {
-        tools: {},
-      },
-    }
-  );
-
-  // Setup handlers for this session
-  sessionServer.setRequestHandler(ListToolsRequestSchema, async () => {
-    console.log('📋 ListTools request received');
-    return { tools: allTools };
-  });
-
-  sessionServer.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const { name, arguments: args } = request.params;
-    console.log(`🔧 CallTool request: ${name}`);
-
-    try {
-      const handler = handlers[name];
-      if (!handler) {
-        throw new Error(`Unknown tool: ${name}`);
-      }
-
-      const result = await handler(args);
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      console.error(`❌ Tool error: ${error.message}`);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify({
-              success: false,
-              error: error.message,
-            }, null, 2),
-          },
-        ],
-        isError: true,
-      };
-    }
-  });
-
-  // Create SSE transport
-  const transport = new SSEServerTransport('/message', res);
-
-  // Connect the server to this transport
-  await sessionServer.connect(transport);
-
-  // Extract session ID from the transport's endpoint message
-  // The transport sends: event: endpoint, data: /message?sessionId=...
-  const match = res._getData && res._getData().match(/sessionId=([^&\s]+)/);
-  const sessionId = match ? match[1] : Date.now().toString();
-  
-  activeSessions.set(sessionId, { server: sessionServer, transport });
-
-  console.log(`✅ MCP Server connected via SSE (session: ${sessionId})`);
-
-  // Handle client disconnect
-  req.on('close', () => {
-    console.log(`📴 SSE connection closed (session: ${sessionId})`);
-    activeSessions.delete(sessionId);
-  });
-});
-
-// MCP message endpoint (for client to send messages)
-app.post('/message', async (req, res) => {
-  const sessionId = req.query.sessionId;
-  console.log(`📨 Received MCP message (session: ${sessionId}):`, JSON.stringify(req.body, null, 2));
-  
-  try {
-    // Get the session for this sessionId
-    const session = activeSessions.get(sessionId);
-    
-    if (!session) {
-      console.error(`❌ No session found for: ${sessionId}`);
-      console.log(`📋 Active sessions:`, Array.from(activeSessions.keys()));
-      return res.status(404).json({ error: 'Session not found' });
-    }
-
-    // The transport and server should handle the message
-    // For SSEServerTransport, we need to acknowledge receipt
-    res.status(202).json({ received: true });
-    
-  } catch (error) {
-    console.error('❌ Error handling message:', error, error.stack);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Also log all requests for debugging
-app.use((req, res, next) => {
-  console.log(`🌐 ${req.method} ${req.url}`);
-  next();
 });
 
 // Info endpoint
@@ -223,55 +57,180 @@ app.get('/', (req, res) => {
   res.json({
     name: 'CMS MCP Server with SSE',
     version: '1.0.0',
-    description: 'MCP Server with Server-Sent Events transport for real-time communication',
+    description: 'MCP Server with Server-Sent Events transport',
     transport: 'SSE (Server-Sent Events)',
     endpoints: {
-      'GET /health': 'Health check',
       'GET /sse': 'SSE connection endpoint for MCP protocol',
-      'POST /message': 'Send messages to MCP server',
-    },
-    connect: {
-      sse: `http://localhost:${PORT}/sse`,
-      message: `http://localhost:${PORT}/message`,
+      'POST /message': 'Message endpoint (with ?sessionId)',
+      'GET /health': 'Health check',
     },
     toolsAvailable: allTools.length,
-    tools: allTools.map(t => ({ name: t.name, description: t.description })),
+    activeSessions: activeSessions.size,
   });
+});
+
+// SSE endpoint - establishes the event stream
+app.get('/sse', async (req, res) => {
+  console.log('📡 New SSE connection request');
+  
+  try {
+    // Create a new MCP server instance for this session
+    const server = new Server(
+      {
+        name: 'cms-admin-mcp-server',
+        version: '1.0.0',
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
+
+    // Setup tool handlers
+    server.setRequestHandler(ListToolsRequestSchema, async () => {
+      console.log('📋 ListTools request received');
+      return { tools: allTools };
+    });
+
+    server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+      console.log(`🔧 Executing tool: ${name}`);
+
+      try {
+        const handler = handlers[name];
+        if (!handler) {
+          throw new Error(`Unknown tool: ${name}`);
+        }
+
+        const result = await handler(args);
+        console.log(`✅ Tool ${name} executed successfully`);
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      } catch (error) {
+        console.error(`❌ Tool ${name} error:`, error.message);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: false,
+                error: error.message,
+              }, null, 2),
+            },
+          ],
+          isError: true,
+        };
+      }
+    });
+
+    // Create SSE transport
+    const transport = new SSEServerTransport('/message', res);
+    
+    // Get the session ID before connecting
+    const sessionId = transport.sessionId;
+    
+    // Store the transport by sessionId for routing POST messages
+    activeSessions.set(sessionId, { server, transport });
+    
+    console.log(`✅ Session created: ${sessionId}`);
+    
+    // Connect server to transport - this calls transport.start() automatically
+    await server.connect(transport);
+    
+    console.log(`✅ MCP Server connected via SSE`);
+
+    // Handle disconnect
+    req.on('close', () => {
+      console.log(`📴 Session closed: ${sessionId}`);
+      activeSessions.delete(sessionId);
+      transport.close();
+    });
+
+  } catch (error) {
+    console.error('❌ SSE connection error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+
+// Message endpoint - receives JSON-RPC messages from client
+// We need to route these to the correct transport based on sessionId
+app.post('/message', async (req, res) => {
+  const sessionId = req.query.sessionId;
+  
+  if (!sessionId) {
+    console.error('❌ No sessionId in message request');
+    return res.status(400).json({ error: 'sessionId required' });
+  }
+
+  console.log(`📨 Message received for session: ${sessionId}`);
+  console.log(`📨 Method: ${req.body.method}, ID: ${req.body.id}`);
+
+  const session = activeSessions.get(sessionId);
+  
+  if (!session) {
+    console.error(`❌ Session not found: ${sessionId}`);
+    console.log(`📋 Active sessions: ${Array.from(activeSessions.keys()).join(', ')}`);
+    return res.status(404).json({ error: 'Session not found' });
+  }
+
+  try {
+    // Route the POST message to the transport's handlePostMessage method
+    // Pass the parsed body as the third parameter
+    await session.transport.handlePostMessage(req, res, req.body);
+    console.log(`✅ Message processed successfully`);
+  } catch (error) {
+    console.error('❌ Message handling error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 });
 
 // Start server
-const server = app.listen(PORT, () => {
+const httpServer = app.listen(PORT, () => {
+  console.log('');
   console.log('🚀 ==========================================');
   console.log('🤖 CMS MCP Server with SSE Transport');
   console.log('🚀 ==========================================');
-  console.log(`📡 Server running on: http://localhost:${PORT}`);
+  console.log(`📡 Server: http://localhost:${PORT}`);
   console.log(`📡 SSE Endpoint: http://localhost:${PORT}/sse`);
-  console.log(`📬 Message Endpoint: http://localhost:${PORT}/message`);
-  console.log(`💚 Health Check: http://localhost:${PORT}/health`);
-  console.log(`📚 Server Info: http://localhost:${PORT}/`);
+  console.log(`💚 Health: http://localhost:${PORT}/health`);
   console.log('🚀 ==========================================');
-  console.log(`📊 Total MCP Tools: ${allTools.length}`);
+  console.log(`📊 Tools Available: ${allTools.length}`);
   console.log(`🔌 Transport: SSE (Server-Sent Events)`);
-  console.log('🚀 ==========================================\n');
-  console.log('✅ Ready for MCP client connections!\n');
+  console.log('🚀 ==========================================');
+  console.log('');
+  console.log('✅ Ready for MCP SSE connections!');
+  console.log('');
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
-  server.close(() => {
-    console.log('Server closed');
+const shutdown = () => {
+  console.log('\n🛑 Shutting down...');
+  activeSessions.forEach((session, sessionId) => {
+    console.log(`📴 Closing session: ${sessionId}`);
+    if (session.transport) {
+      session.transport.close();
+    }
+  });
+  activeSessions.clear();
+  httpServer.close(() => {
+    console.log('✅ Server closed');
     process.exit(0);
   });
-});
+};
 
-process.on('SIGINT', () => {
-  console.log('\nSIGINT received. Shutting down gracefully...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
-});
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
 
 module.exports = app;
-
