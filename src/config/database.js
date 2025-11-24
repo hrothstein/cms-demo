@@ -4,14 +4,14 @@ const crypto = require('crypto');
 // Database configuration
 const dbConfig = process.env.DATABASE_URL ? {
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: process.env.DATABASE_SSL === 'false' ? false : { rejectUnauthorized: false }
 } : {
   user: process.env.DB_USER || 'cms_user',
   host: process.env.DB_HOST || 'localhost',
   database: process.env.DB_NAME || 'cms_db',
   password: process.env.DB_PASSWORD || 'cms_password',
   port: process.env.DB_PORT || 5432,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: false, // Always false for local development
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
   connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established

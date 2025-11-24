@@ -1,0 +1,352 @@
+{
+  "info": {
+    "name": "CMS MCP Server API",
+    "description": "Test collection for CMS MCP Server - All 29 AI Agent Tools",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Server Info",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "List All Tools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/tools",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer Management",
+      "item": [
+        {
+          "name": "Get Customers",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"limit\": 10,\n  \"offset\": 0\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_customers/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_customers", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"CUST-12345\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_customer/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_customer", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Search Customers",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"john\",\n  \"limit\": 10\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_search_customers/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_search_customers", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"test.user\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Test123!\",\n  \"phone\": \"+1-555-0199\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_create_customer/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_create_customer", "execute"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Card Management",
+      "item": [
+        {
+          "name": "Get Cards",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"limit\": 10,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_cards/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_cards", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Get Card by ID",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CRD-0001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_card/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_card", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Lock Card",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"reason\": \"fraud_suspected\",\n  \"notes\": \"Testing lock via Postman\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_lock_card/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_lock_card", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Unlock Card",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"notes\": \"Testing unlock via Postman\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_unlock_card/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_unlock_card", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Update Card Controls",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"international_enabled\": false,\n  \"online_enabled\": true,\n  \"daily_limit\": 500\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_update_card_controls/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_update_card_controls", "execute"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Get Transactions",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"limit\": 10\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_transactions/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_transactions", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction by ID",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transaction_id\": \"TXN-001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_transaction/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_transaction", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Search Transactions",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"query\": \"Starbucks\",\n  \"min_amount\": 5,\n  \"max_amount\": 50\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_search_transactions/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_search_transactions", "execute"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disputes",
+      "item": [
+        {
+          "name": "Create Dispute",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transaction_id\": \"TXN-001\",\n  \"dispute_type\": \"unauthorized\",\n  \"reason\": \"I did not authorize this transaction\",\n  \"evidence_description\": \"Card was in my possession\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_create_dispute/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_create_dispute", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Get Disputes",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"limit\": 10\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_disputes/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_disputes", "execute"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Batch Operations",
+      "item": [
+        {
+          "name": "Batch Execute Multiple Tools",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tools\": [\n    {\n      \"name\": \"cms_get_customers\",\n      \"args\": {\"limit\": 2}\n    },\n    {\n      \"name\": \"cms_get_cards\",\n      \"args\": {\"limit\": 2}\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/batch",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "batch"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
