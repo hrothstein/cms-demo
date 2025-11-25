@@ -2,162 +2,211 @@
  * MCP Tool Handlers - In-Memory Storage
  * Uses in-memory arrays for CRUD operations
  * Data is lost on server restart (perfect for demos)
+ * 
+ * Aligned with bankingcoredemo mock data structure
  */
 
 // ========================================
 // In-Memory Data Store
 // ========================================
 
+// Matching the naming conventions from bankingcoredemo
+const firstNames = ['John', 'Jane', 'Michael', 'Sarah', 'David', 'Emily', 'Robert', 'Lisa', 'James', 'Mary'];
+const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
+const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'];
+const states = ['NY', 'CA', 'IL', 'TX', 'AZ', 'PA', 'TX', 'CA', 'TX', 'CA'];
+
+// Generate initial customer data matching bankingcoredemo structure
+function generateInitialCustomers() {
+  const customers = [];
+  
+  // Generate 50 customers to match banking system (using first 10 for cards)
+  for (let i = 0; i < 50; i++) {
+    const firstName = firstNames[i % firstNames.length];
+    const lastName = lastNames[i % lastNames.length];
+    const cityIndex = i % cities.length;
+    
+    customers.push({
+      customer_id: `CUST-${String(i + 1).padStart(3, '0')}`,
+      username: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}`,
+      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@example.com`,
+      phone: `+1-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
+      first_name: firstName,
+      last_name: lastName,
+      city: cities[cityIndex],
+      state: states[cityIndex],
+      postal_code: `${Math.floor(Math.random() * 90000) + 10000}`,
+      is_active: true,
+      account_status: 'ACTIVE',
+      created_at: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000).toISOString(),
+      last_login: new Date(Date.now() - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000).toISOString()
+    });
+  }
+  
+  return customers;
+}
+
+// Generate a card for each customer (matching banking accounts)
+function generateInitialCards(customers) {
+  const cards = [];
+  const cardTypes = ['DEBIT', 'CREDIT', 'DEBIT', 'CREDIT', 'PREPAID']; // More debit cards than credit
+  
+  customers.forEach((customer, index) => {
+    // Create 1-2 cards per customer (focusing on first 30 customers for active cards)
+    const numCards = index < 30 ? (Math.random() < 0.6 ? 2 : 1) : 1;
+    
+    for (let j = 0; j < numCards; j++) {
+      const cardType = cardTypes[(index + j) % cardTypes.length];
+      const lastFour = String(1000 + (index * 100 + j * 10) % 9000).padStart(4, '0');
+      const cardNumber = cardType === 'CREDIT' ? `5500 0000 0000 ${lastFour}` : `4111 1111 1111 ${lastFour}`;
+      
+      const card = {
+        card_id: `CARD-${String(cards.length + 1).padStart(3, '0')}`,
+        customer_id: customer.customer_id,
+        customer_name: `${customer.first_name} ${customer.last_name}`,
+        card_number: `**** **** **** ${lastFour}`,
+        full_card_number: cardNumber,
+        card_type: cardType,
+        card_status: index < 30 ? 'ACTIVE' : (Math.random() < 0.8 ? 'ACTIVE' : 'INACTIVE'),
+        expiry_date: `${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}/${25 + Math.floor(Math.random() * 5)}`,
+        cvv: String(Math.floor(Math.random() * 900) + 100),
+        balance: cardType === 'DEBIT' ? Math.floor(Math.random() * 10000) + 500 : Math.floor(Math.random() * 5000),
+        credit_limit: cardType === 'CREDIT' ? (5000 + Math.floor(Math.random() * 20000)) : (cardType === 'PREPAID' ? 2000 : 5000),
+        daily_limit: cardType === 'CREDIT' ? 2000 : 1000,
+        monthly_limit: cardType === 'CREDIT' ? 10000 : 5000,
+        is_locked: false,
+        created_at: customer.created_at,
+        last_used: Math.random() < 0.7 ? new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString() : null
+      };
+      
+      cards.push(card);
+    }
+  });
+  
+  return cards;
+}
+
+// Generate transactions matching cards
+function generateInitialTransactions(cards) {
+  const transactions = [];
+  const merchants = [
+    { name: 'Starbucks Coffee', category: 'Food & Dining', city: 'San Francisco', state: 'CA' },
+    { name: 'Amazon', category: 'Shopping', city: 'Seattle', state: 'WA' },
+    { name: 'Target', category: 'Shopping', city: 'Minneapolis', state: 'MN' },
+    { name: 'Shell Gas Station', category: 'Gas & Fuel', city: 'Houston', state: 'TX' },
+    { name: 'Whole Foods Market', category: 'Groceries', city: 'Austin', state: 'TX' },
+    { name: 'Netflix', category: 'Entertainment', city: 'Los Gatos', state: 'CA' },
+    { name: 'Uber', category: 'Transportation', city: 'San Francisco', state: 'CA' },
+    { name: 'Apple Store', category: 'Electronics', city: 'Cupertino', state: 'CA' },
+    { name: 'CVS Pharmacy', category: 'Healthcare', city: 'Woonsocket', state: 'RI' },
+    { name: 'Home Depot', category: 'Home Improvement', city: 'Atlanta', state: 'GA' }
+  ];
+  
+  // Generate 10-20 transactions per active card
+  cards.filter(c => c.card_status === 'ACTIVE').forEach((card, cardIndex) => {
+    const numTransactions = Math.floor(Math.random() * 10) + 10;
+    
+    for (let i = 0; i < numTransactions; i++) {
+      const merchant = merchants[Math.floor(Math.random() * merchants.length)];
+      const amount = -(Math.floor(Math.random() * 20000) + 500) / 100; // $5.00 to $200.00
+      const daysAgo = Math.floor(Math.random() * 60); // Last 60 days
+      
+      transactions.push({
+        transaction_id: `TXN-${String(transactions.length + 1).padStart(4, '0')}`,
+        card_id: card.card_id,
+        customer_id: card.customer_id,
+        customer_name: card.customer_name,
+        card_last_four: card.card_number.slice(-4),
+        amount: amount,
+        merchant: merchant.name,
+        merchant_name: merchant.name,
+        merchant_category: merchant.category,
+        category: merchant.category,
+        transaction_date: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString(),
+        transaction_status: 'COMPLETED',
+        status: 'COMPLETED',
+        location: { city: merchant.city, state: merchant.state, country: 'US' }
+      });
+    }
+  });
+  
+  return transactions;
+}
+
+// Generate alerts
+function generateInitialAlerts(customers) {
+  const alerts = [];
+  const alertTypes = ['FRAUD_DETECTED', 'LARGE_TRANSACTION', 'UNUSUAL_ACTIVITY', 'CARD_DECLINED', 'SUSPICIOUS_LOGIN'];
+  
+  // 20% of customers have alerts
+  customers.slice(0, 10).forEach((customer, index) => {
+    if (Math.random() < 0.5) {
+      alerts.push({
+        alert_id: `ALERT-${String(alerts.length + 1).padStart(3, '0')}`,
+        customer_id: customer.customer_id,
+        alert_type: alertTypes[Math.floor(Math.random() * alertTypes.length)],
+        severity: ['LOW', 'MEDIUM', 'HIGH'][Math.floor(Math.random() * 3)],
+        message: 'Unusual activity detected on your account',
+        details: 'Multiple transactions from different locations detected',
+        alert_status: Math.random() < 0.3 ? 'READ' : 'UNREAD',
+        status: Math.random() < 0.3 ? 'READ' : 'UNREAD',
+        created_at: new Date(Date.now() - Math.floor(Math.random() * 14) * 24 * 60 * 60 * 1000).toISOString(),
+        is_read: Math.random() < 0.3
+      });
+    }
+  });
+  
+  return alerts;
+}
+
+// Generate disputes
+function generateInitialDisputes(transactions, cards) {
+  const disputes = [];
+  
+  // 2% of transactions have disputes
+  transactions.slice(0, 20).forEach((transaction, index) => {
+    if (Math.random() < 0.1) {
+      const card = cards.find(c => c.card_id === transaction.card_id);
+      disputes.push({
+        dispute_id: `DISPUTE-${String(disputes.length + 1).padStart(3, '0')}`,
+        transaction_id: transaction.transaction_id,
+        customer_id: transaction.customer_id,
+        card_id: transaction.card_id,
+        amount: Math.abs(transaction.amount),
+        reason: ['Unauthorized transaction', 'Duplicate charge', 'Service not received', 'Product defective'][Math.floor(Math.random() * 4)],
+        description: 'I did not authorize this transaction',
+        dispute_status: ['PENDING', 'UNDER_REVIEW', 'RESOLVED'][Math.floor(Math.random() * 3)],
+        status: ['PENDING', 'UNDER_REVIEW', 'RESOLVED'][Math.floor(Math.random() * 3)],
+        created_at: new Date(new Date(transaction.transaction_date).getTime() + Math.floor(Math.random() * 5) * 24 * 60 * 60 * 1000).toISOString(),
+        resolution: null
+      });
+    }
+  });
+  
+  return disputes;
+}
+
+// Initialize data store
+const initialCustomers = generateInitialCustomers();
+const initialCards = generateInitialCards(initialCustomers);
+const initialTransactions = generateInitialTransactions(initialCards);
+const initialAlerts = generateInitialAlerts(initialCustomers);
+const initialDisputes = generateInitialDisputes(initialTransactions, initialCards);
+
 const dataStore = {
-  customers: [
-    {
-      customer_id: 'CUST-001',
-      username: 'john.doe',
-      email: 'john.doe@example.com',
-      phone: '+1-555-0123',
-      is_active: true,
-      account_status: 'ACTIVE',
-      created_at: '2024-01-15T10:30:00Z',
-      last_login: '2024-01-20T14:30:00Z'
-    },
-    {
-      customer_id: 'CUST-002',
-      username: 'jane.smith',
-      email: 'jane.smith@example.com',
-      phone: '+1-555-0124',
-      is_active: true,
-      account_status: 'ACTIVE',
-      created_at: '2024-01-16T14:20:00Z',
-      last_login: '2024-01-21T09:15:00Z'
-    }
-  ],
+  customers: initialCustomers,
+  cards: initialCards,
+  transactions: initialTransactions,
+  alerts: initialAlerts,
+  disputes: initialDisputes,
   
-  cards: [
-    {
-      card_id: 'CARD-001',
-      customer_id: 'CUST-001',
-      card_number: '**** **** **** 1234',
-      full_card_number: '4111 1111 1111 1234',
-      card_type: 'DEBIT',
-      card_status: 'ACTIVE',
-      expiry_date: '12/25',
-      cvv: '123',
-      balance: 2500.00,
-      credit_limit: 5000.00,
-      daily_limit: 1000.00,
-      monthly_limit: 5000.00,
-      is_locked: false,
-      created_at: '2024-01-15T10:30:00Z',
-      last_used: '2024-01-20T14:30:00Z'
-    },
-    {
-      card_id: 'CARD-002',
-      customer_id: 'CUST-001',
-      card_number: '**** **** **** 5678',
-      full_card_number: '5500 0000 0000 5678',
-      card_type: 'CREDIT',
-      card_status: 'ACTIVE',
-      expiry_date: '08/26',
-      cvv: '456',
-      balance: 1200.00,
-      credit_limit: 10000.00,
-      daily_limit: 2000.00,
-      monthly_limit: 10000.00,
-      is_locked: false,
-      created_at: '2024-01-16T11:00:00Z',
-      last_used: '2024-01-21T09:00:00Z'
-    }
-  ],
-  
-  transactions: [
-    {
-      transaction_id: 'TXN-001',
-      card_id: 'CARD-001',
-      customer_id: 'CUST-001',
-      amount: -45.50,
-      merchant: 'Starbucks Coffee',
-      merchant_name: 'Starbucks Coffee',
-      customer_name: 'John Doe',
-      card_last_four: '1234',
-      merchant_category: 'Food & Dining',
-      category: 'Food & Dining',
-      transaction_date: '2024-01-20T10:30:00Z',
-      transaction_status: 'COMPLETED',
-      status: 'COMPLETED',
-      location: { city: 'San Francisco', state: 'CA', country: 'US' }
-    },
-    {
-      transaction_id: 'TXN-002',
-      card_id: 'CARD-001',
-      customer_id: 'CUST-001',
-      amount: -120.00,
-      merchant: 'Amazon',
-      merchant_name: 'Amazon',
-      customer_name: 'John Doe',
-      card_last_four: '1234',
-      merchant_category: 'Shopping',
-      category: 'Shopping',
-      transaction_date: '2024-01-19T15:45:00Z',
-      transaction_status: 'COMPLETED',
-      status: 'COMPLETED',
-      location: { city: 'Seattle', state: 'WA', country: 'US' }
-    },
-    {
-      transaction_id: 'TXN-003',
-      card_id: 'CARD-002',
-      customer_id: 'CUST-001',
-      amount: -89.99,
-      merchant: 'Target',
-      merchant_name: 'Target',
-      customer_name: 'John Doe',
-      card_last_four: '5678',
-      merchant_category: 'Shopping',
-      category: 'Shopping',
-      transaction_date: '2024-01-18T09:15:00Z',
-      transaction_status: 'COMPLETED',
-      status: 'COMPLETED',
-      location: { city: 'San Francisco', state: 'CA', country: 'US' }
-    }
-  ],
-  
-  alerts: [
-    {
-      alert_id: 'ALERT-001',
-      customer_id: 'CUST-001',
-      alert_type: 'FRAUD_DETECTED',
-      severity: 'HIGH',
-      message: 'Unusual spending pattern detected',
-      details: 'Multiple high-value transactions in short time period',
-      alert_status: 'UNREAD',
-      status: 'UNREAD',
-      created_at: '2024-01-20T12:00:00Z',
-      is_read: false
-    }
-  ],
-  
-  disputes: [
-    {
-      dispute_id: 'DISPUTE-001',
-      transaction_id: 'TXN-001',
-      customer_id: 'CUST-001',
-      card_id: 'CARD-001',
-      amount: 45.50,
-      reason: 'Unauthorized transaction',
-      description: 'I did not make this purchase',
-      dispute_status: 'PENDING',
-      status: 'PENDING',
-      created_at: '2024-01-20T11:00:00Z',
-      resolution: null
-    }
-  ],
-  
-  // Counters for generating IDs
+  // Counters for generating new IDs
   counters: {
-    customer: 3,
-    card: 3,
-    transaction: 4,
-    alert: 2,
-    dispute: 2
+    customer: initialCustomers.length + 1,
+    card: initialCards.length + 1,
+    transaction: initialTransactions.length + 1,
+    alert: initialAlerts.length + 1,
+    dispute: initialDisputes.length + 1
   }
 };
 
@@ -167,6 +216,14 @@ function generateId(type) {
   const prefix = type.toUpperCase();
   return `${prefix}-${String(counter).padStart(3, '0')}`;
 }
+
+// Log initial data stats
+console.log('📊 In-Memory Data Store Initialized:');
+console.log(`   👥 ${dataStore.customers.length} customers`);
+console.log(`   💳 ${dataStore.cards.length} cards`);
+console.log(`   💵 ${dataStore.transactions.length} transactions`);
+console.log(`   🚨 ${dataStore.alerts.length} alerts`);
+console.log(`   ⚖️  ${dataStore.disputes.length} disputes`);
 
 // ========================================
 // Customer Management Handlers
@@ -182,7 +239,9 @@ async function cms_get_customers(args) {
     filtered = filtered.filter(c => 
       c.customer_id.toLowerCase().includes(searchLower) ||
       c.username.toLowerCase().includes(searchLower) ||
-      c.email.toLowerCase().includes(searchLower)
+      c.email.toLowerCase().includes(searchLower) ||
+      c.first_name.toLowerCase().includes(searchLower) ||
+      c.last_name.toLowerCase().includes(searchLower)
     );
   }
   
@@ -213,7 +272,7 @@ async function cms_get_customers(args) {
 }
 
 async function cms_create_customer(args) {
-  const { username, email, phone, password } = args;
+  const { username, email, phone, password, first_name, last_name } = args;
   
   // Check for duplicate email
   if (dataStore.customers.some(c => c.email === email)) {
@@ -225,6 +284,11 @@ async function cms_create_customer(args) {
     username,
     email,
     phone,
+    first_name: first_name || username.split('.')[0],
+    last_name: last_name || username.split('.')[1] || '',
+    city: cities[Math.floor(Math.random() * cities.length)],
+    state: states[Math.floor(Math.random() * states.length)],
+    postal_code: `${Math.floor(Math.random() * 90000) + 10000}`,
     is_active: true,
     account_status: 'ACTIVE',
     created_at: new Date().toISOString(),
@@ -241,7 +305,7 @@ async function cms_create_customer(args) {
 }
 
 async function cms_update_customer(args) {
-  const { customer_id, email, phone } = args;
+  const { customer_id, email, phone, first_name, last_name } = args;
   
   const customerIndex = dataStore.customers.findIndex(c => c.customer_id === customer_id);
   
@@ -251,6 +315,8 @@ async function cms_update_customer(args) {
   
   if (email) dataStore.customers[customerIndex].email = email;
   if (phone) dataStore.customers[customerIndex].phone = phone;
+  if (first_name) dataStore.customers[customerIndex].first_name = first_name;
+  if (last_name) dataStore.customers[customerIndex].last_name = last_name;
   
   return {
     success: true,
@@ -271,6 +337,9 @@ async function cms_delete_customer(args) {
   // Remove customer and their cards
   dataStore.customers.splice(customerIndex, 1);
   dataStore.cards = dataStore.cards.filter(c => c.customer_id !== customer_id);
+  dataStore.transactions = dataStore.transactions.filter(t => t.customer_id !== customer_id);
+  dataStore.alerts = dataStore.alerts.filter(a => a.customer_id !== customer_id);
+  dataStore.disputes = dataStore.disputes.filter(d => d.customer_id !== customer_id);
   
   return {
     success: true,
@@ -339,21 +408,22 @@ async function cms_create_card(args) {
   }
   
   const lastFour = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-  const fullNumber = `4111 1111 1111 ${lastFour}`;
+  const fullNumber = card_type === 'CREDIT' ? `5500 0000 0000 ${lastFour}` : `4111 1111 1111 ${lastFour}`;
   
   const newCard = {
     card_id: generateId('card'),
     customer_id,
+    customer_name: `${customer.first_name} ${customer.last_name}`,
     card_number: `**** **** **** ${lastFour}`,
     full_card_number: fullNumber,
     card_type: card_type || 'DEBIT',
     card_status: 'ACTIVE',
     expiry_date: '12/28',
-    cvv: String(Math.floor(Math.random() * 1000)).padStart(3, '0'),
+    cvv: String(Math.floor(Math.random() * 900) + 100),
     balance: 0,
-    credit_limit: credit_limit || 5000,
-    daily_limit: 1000,
-    monthly_limit: 5000,
+    credit_limit: credit_limit || (card_type === 'CREDIT' ? 10000 : 5000),
+    daily_limit: card_type === 'CREDIT' ? 2000 : 1000,
+    monthly_limit: card_type === 'CREDIT' ? 10000 : 5000,
     is_locked: false,
     created_at: new Date().toISOString(),
     last_used: null
@@ -473,6 +543,9 @@ async function cms_get_transactions(args) {
     filtered = filtered.filter(t => t.transaction_status.toLowerCase() === status.toLowerCase());
   }
   
+  // Sort by date descending
+  filtered.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
+  
   const paginated = filtered.slice(offset, offset + limit);
   
   return {
@@ -508,6 +581,9 @@ async function cms_get_alerts(args) {
   if (status) {
     filtered = filtered.filter(a => a.alert_status.toLowerCase() === status.toLowerCase());
   }
+  
+  // Sort by date descending
+  filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   
   const paginated = filtered.slice(offset, offset + limit);
   
@@ -630,6 +706,9 @@ async function cms_get_disputes(args) {
   if (status) {
     filtered = filtered.filter(d => d.dispute_status.toLowerCase() === status.toLowerCase());
   }
+  
+  // Sort by date descending
+  filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   
   const paginated = filtered.slice(offset, offset + limit);
   
