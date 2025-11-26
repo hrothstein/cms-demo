@@ -1,229 +1,21 @@
 /**
- * MCP Tool Handlers - In-Memory Storage
- * Uses in-memory arrays for CRUD operations
- * Data is lost on server restart (perfect for demos)
- * 
- * Aligned with bankingcoredemo mock data structure
+ * MCP Tool Handlers
+ * Uses datastore for all CRUD operations
+ * Implements all 29 MCP tools per PRD Section 17.3
  */
 
-// ========================================
-// In-Memory Data Store
-// ========================================
+const { 
+  datastore,
+  customerOps,
+  cardOps,
+  getCustomers,
+  getCards,
+  getTransactions,
+  getAlerts,
+  getDisputes,
+} = require('../datastore');
 
-// Matching the naming conventions from bankingcoredemo
-const firstNames = ['John', 'Jane', 'Michael', 'Sarah', 'David', 'Emily', 'Robert', 'Lisa', 'James', 'Mary'];
-const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
-const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'];
-const states = ['NY', 'CA', 'IL', 'TX', 'AZ', 'PA', 'TX', 'CA', 'TX', 'CA'];
-
-// Generate initial customer data matching bankingcoredemo structure
-function generateInitialCustomers() {
-  const customers = [];
-  
-  // Generate 50 customers to match banking system (using first 10 for cards)
-  for (let i = 0; i < 50; i++) {
-    const firstName = firstNames[i % firstNames.length];
-    const lastName = lastNames[i % lastNames.length];
-    const cityIndex = i % cities.length;
-    
-    customers.push({
-      customer_id: `CUST-${String(i + 1).padStart(3, '0')}`,
-      username: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}`,
-      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@example.com`,
-      phone: `+1-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
-      first_name: firstName,
-      last_name: lastName,
-      city: cities[cityIndex],
-      state: states[cityIndex],
-      postal_code: `${Math.floor(Math.random() * 90000) + 10000}`,
-      is_active: true,
-      account_status: 'ACTIVE',
-      created_at: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000).toISOString(),
-      last_login: new Date(Date.now() - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000).toISOString()
-    });
-  }
-  
-  return customers;
-}
-
-// Generate a card for each customer (matching banking accounts)
-function generateInitialCards(customers) {
-  const cards = [];
-  const cardTypes = ['DEBIT', 'CREDIT', 'DEBIT', 'CREDIT', 'PREPAID']; // More debit cards than credit
-  
-  customers.forEach((customer, index) => {
-    // Create 1-2 cards per customer (focusing on first 30 customers for active cards)
-    const numCards = index < 30 ? (Math.random() < 0.6 ? 2 : 1) : 1;
-    
-    for (let j = 0; j < numCards; j++) {
-      const cardType = cardTypes[(index + j) % cardTypes.length];
-      const lastFour = String(1000 + (index * 100 + j * 10) % 9000).padStart(4, '0');
-      const cardNumber = cardType === 'CREDIT' ? `5500 0000 0000 ${lastFour}` : `4111 1111 1111 ${lastFour}`;
-      
-      const card = {
-        card_id: `CARD-${String(cards.length + 1).padStart(3, '0')}`,
-        customer_id: customer.customer_id,
-        customer_name: `${customer.first_name} ${customer.last_name}`,
-        card_number: `**** **** **** ${lastFour}`,
-        full_card_number: cardNumber,
-        card_type: cardType,
-        card_status: index < 30 ? 'ACTIVE' : (Math.random() < 0.8 ? 'ACTIVE' : 'INACTIVE'),
-        expiry_date: `${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}/${25 + Math.floor(Math.random() * 5)}`,
-        cvv: String(Math.floor(Math.random() * 900) + 100),
-        balance: cardType === 'DEBIT' ? Math.floor(Math.random() * 10000) + 500 : Math.floor(Math.random() * 5000),
-        credit_limit: cardType === 'CREDIT' ? (5000 + Math.floor(Math.random() * 20000)) : (cardType === 'PREPAID' ? 2000 : 5000),
-        daily_limit: cardType === 'CREDIT' ? 2000 : 1000,
-        monthly_limit: cardType === 'CREDIT' ? 10000 : 5000,
-        is_locked: false,
-        created_at: customer.created_at,
-        last_used: Math.random() < 0.7 ? new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString() : null
-      };
-      
-      cards.push(card);
-    }
-  });
-  
-  return cards;
-}
-
-// Generate transactions matching cards
-function generateInitialTransactions(cards) {
-  const transactions = [];
-  const merchants = [
-    { name: 'Starbucks Coffee', category: 'Food & Dining', city: 'San Francisco', state: 'CA' },
-    { name: 'Amazon', category: 'Shopping', city: 'Seattle', state: 'WA' },
-    { name: 'Target', category: 'Shopping', city: 'Minneapolis', state: 'MN' },
-    { name: 'Shell Gas Station', category: 'Gas & Fuel', city: 'Houston', state: 'TX' },
-    { name: 'Whole Foods Market', category: 'Groceries', city: 'Austin', state: 'TX' },
-    { name: 'Netflix', category: 'Entertainment', city: 'Los Gatos', state: 'CA' },
-    { name: 'Uber', category: 'Transportation', city: 'San Francisco', state: 'CA' },
-    { name: 'Apple Store', category: 'Electronics', city: 'Cupertino', state: 'CA' },
-    { name: 'CVS Pharmacy', category: 'Healthcare', city: 'Woonsocket', state: 'RI' },
-    { name: 'Home Depot', category: 'Home Improvement', city: 'Atlanta', state: 'GA' }
-  ];
-  
-  // Generate 10-20 transactions per active card
-  cards.filter(c => c.card_status === 'ACTIVE').forEach((card, cardIndex) => {
-    const numTransactions = Math.floor(Math.random() * 10) + 10;
-    
-    for (let i = 0; i < numTransactions; i++) {
-      const merchant = merchants[Math.floor(Math.random() * merchants.length)];
-      const amount = -(Math.floor(Math.random() * 20000) + 500) / 100; // $5.00 to $200.00
-      const daysAgo = Math.floor(Math.random() * 60); // Last 60 days
-      
-      transactions.push({
-        transaction_id: `TXN-${String(transactions.length + 1).padStart(4, '0')}`,
-        card_id: card.card_id,
-        customer_id: card.customer_id,
-        customer_name: card.customer_name,
-        card_last_four: card.card_number.slice(-4),
-        amount: amount,
-        merchant: merchant.name,
-        merchant_name: merchant.name,
-        merchant_category: merchant.category,
-        category: merchant.category,
-        transaction_date: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString(),
-        transaction_status: 'COMPLETED',
-        status: 'COMPLETED',
-        location: { city: merchant.city, state: merchant.state, country: 'US' }
-      });
-    }
-  });
-  
-  return transactions;
-}
-
-// Generate alerts
-function generateInitialAlerts(customers) {
-  const alerts = [];
-  const alertTypes = ['FRAUD_DETECTED', 'LARGE_TRANSACTION', 'UNUSUAL_ACTIVITY', 'CARD_DECLINED', 'SUSPICIOUS_LOGIN'];
-  
-  // 20% of customers have alerts
-  customers.slice(0, 10).forEach((customer, index) => {
-    if (Math.random() < 0.5) {
-      alerts.push({
-        alert_id: `ALERT-${String(alerts.length + 1).padStart(3, '0')}`,
-        customer_id: customer.customer_id,
-        alert_type: alertTypes[Math.floor(Math.random() * alertTypes.length)],
-        severity: ['LOW', 'MEDIUM', 'HIGH'][Math.floor(Math.random() * 3)],
-        message: 'Unusual activity detected on your account',
-        details: 'Multiple transactions from different locations detected',
-        alert_status: Math.random() < 0.3 ? 'READ' : 'UNREAD',
-        status: Math.random() < 0.3 ? 'READ' : 'UNREAD',
-        created_at: new Date(Date.now() - Math.floor(Math.random() * 14) * 24 * 60 * 60 * 1000).toISOString(),
-        is_read: Math.random() < 0.3
-      });
-    }
-  });
-  
-  return alerts;
-}
-
-// Generate disputes
-function generateInitialDisputes(transactions, cards) {
-  const disputes = [];
-  
-  // 2% of transactions have disputes
-  transactions.slice(0, 20).forEach((transaction, index) => {
-    if (Math.random() < 0.1) {
-      const card = cards.find(c => c.card_id === transaction.card_id);
-      disputes.push({
-        dispute_id: `DISPUTE-${String(disputes.length + 1).padStart(3, '0')}`,
-        transaction_id: transaction.transaction_id,
-        customer_id: transaction.customer_id,
-        card_id: transaction.card_id,
-        amount: Math.abs(transaction.amount),
-        reason: ['Unauthorized transaction', 'Duplicate charge', 'Service not received', 'Product defective'][Math.floor(Math.random() * 4)],
-        description: 'I did not authorize this transaction',
-        dispute_status: ['PENDING', 'UNDER_REVIEW', 'RESOLVED'][Math.floor(Math.random() * 3)],
-        status: ['PENDING', 'UNDER_REVIEW', 'RESOLVED'][Math.floor(Math.random() * 3)],
-        created_at: new Date(new Date(transaction.transaction_date).getTime() + Math.floor(Math.random() * 5) * 24 * 60 * 60 * 1000).toISOString(),
-        resolution: null
-      });
-    }
-  });
-  
-  return disputes;
-}
-
-// Initialize data store
-const initialCustomers = generateInitialCustomers();
-const initialCards = generateInitialCards(initialCustomers);
-const initialTransactions = generateInitialTransactions(initialCards);
-const initialAlerts = generateInitialAlerts(initialCustomers);
-const initialDisputes = generateInitialDisputes(initialTransactions, initialCards);
-
-const dataStore = {
-  customers: initialCustomers,
-  cards: initialCards,
-  transactions: initialTransactions,
-  alerts: initialAlerts,
-  disputes: initialDisputes,
-  
-  // Counters for generating new IDs
-  counters: {
-    customer: initialCustomers.length + 1,
-    card: initialCards.length + 1,
-    transaction: initialTransactions.length + 1,
-    alert: initialAlerts.length + 1,
-    dispute: initialDisputes.length + 1
-  }
-};
-
-// Helper function to generate IDs
-function generateId(type) {
-  const counter = dataStore.counters[type]++;
-  const prefix = type.toUpperCase();
-  return `${prefix}-${String(counter).padStart(3, '0')}`;
-}
-
-// Log initial data stats
-console.log('📊 In-Memory Data Store Initialized:');
-console.log(`   👥 ${dataStore.customers.length} customers`);
-console.log(`   💳 ${dataStore.cards.length} cards`);
-console.log(`   💵 ${dataStore.transactions.length} transactions`);
-console.log(`   🚨 ${dataStore.alerts.length} alerts`);
-console.log(`   ⚖️  ${dataStore.disputes.length} disputes`);
+const { v4: uuidv4 } = require('uuid');
 
 // ========================================
 // Customer Management Handlers
@@ -233,16 +25,14 @@ console.log(`   ⚖️  ${dataStore.disputes.length} disputes`);
 async function cms_get_customer(args) {
   const { customer_id } = args;
   
-  const customer = dataStore.customers.find(c => 
-    c.customer_id.toUpperCase() === customer_id.toUpperCase()
-  );
+  const customer = customerOps.getById(customer_id);
   
   if (!customer) {
     throw new Error(`Customer ${customer_id} not found`);
   }
   
   // Add card counts
-  const customerCards = dataStore.cards.filter(c => c.customer_id === customer.customer_id);
+  const customerCards = getCards().filter(c => c.customer_id === customer.customer_id);
   const customerWithCounts = {
     ...customer,
     card_count: customerCards.length,
@@ -256,29 +46,13 @@ async function cms_get_customer(args) {
 }
 
 async function cms_get_customers(args) {
-  const { limit = 20, offset = 0, search = '', status = '' } = args;
+  const { limit = 20, offset = 0, search = '', customer_type = '', kyc_status = '', risk_rating = '' } = args;
   
-  let filtered = [...dataStore.customers];
-  
-  if (search) {
-    const searchLower = search.toLowerCase();
-    filtered = filtered.filter(c => 
-      c.customer_id.toLowerCase().includes(searchLower) ||
-      c.username.toLowerCase().includes(searchLower) ||
-      c.email.toLowerCase().includes(searchLower) ||
-      c.first_name.toLowerCase().includes(searchLower) ||
-      c.last_name.toLowerCase().includes(searchLower)
-    );
-  }
-  
-  if (status) {
-    const isActive = status.toLowerCase() === 'active';
-    filtered = filtered.filter(c => c.is_active === isActive);
-  }
+  let filtered = customerOps.getAll({ search, customer_type, kyc_status, risk_rating });
   
   // Add card counts
   const customersWithCounts = filtered.map(customer => {
-    const customerCards = dataStore.cards.filter(c => c.customer_id === customer.customer_id);
+    const customerCards = getCards().filter(c => c.customer_id === customer.customer_id);
     return {
       ...customer,
       card_count: customerCards.length,
@@ -291,81 +65,88 @@ async function cms_get_customers(args) {
   return {
     success: true,
     customers: paginated,
-    total: filtered.length,
+    total: customersWithCounts.length,
     limit,
     offset
   };
 }
 
 async function cms_create_customer(args) {
-  const { username, email, phone, password, first_name, last_name } = args;
-  
-  // Check for duplicate email
-  if (dataStore.customers.some(c => c.email === email)) {
-    throw new Error(`Customer with email ${email} already exists`);
-  }
-  
-  const newCustomer = {
-    customer_id: generateId('customer'),
-    username,
+  const {
+    customer_type = 'INDIVIDUAL',
+    first_name,
+    last_name,
+    business_name,
     email,
     phone,
-    first_name: first_name || username.split('.')[0],
-    last_name: last_name || username.split('.')[1] || '',
-    city: cities[Math.floor(Math.random() * cities.length)],
-    state: states[Math.floor(Math.random() * states.length)],
-    postal_code: `${Math.floor(Math.random() * 90000) + 10000}`,
-    is_active: true,
-    account_status: 'ACTIVE',
-    created_at: new Date().toISOString(),
-    last_login: null
-  };
+    address_line1,
+    address_line2,
+    city,
+    state,
+    postal_code,
+    country = 'USA',
+    date_of_birth,
+    ein,
+    kyc_status = 'PENDING',
+    risk_rating = 'LOW',
+    annual_income,
+    employment_status,
+    occupation
+  } = args;
   
-  dataStore.customers.push(newCustomer);
+  const newCustomer = customerOps.create({
+    customer_type,
+    first_name,
+    last_name,
+    business_name,
+    email,
+    phone,
+    address_line1,
+    address_line2,
+    city,
+    state,
+    postal_code,
+    country,
+    date_of_birth,
+    ein,
+    kyc_status,
+    risk_rating,
+    annual_income,
+    employment_status,
+    occupation
+  });
   
   return {
     success: true,
-    message: 'Customer created successfully',
-    customer: newCustomer
+    customer: newCustomer,
+    message: 'Customer created successfully'
   };
 }
 
 async function cms_update_customer(args) {
-  const { customer_id, email, phone, first_name, last_name } = args;
+  const { customer_id, ...updates } = args;
   
-  const customerIndex = dataStore.customers.findIndex(c => c.customer_id === customer_id);
+  const updatedCustomer = customerOps.update(customer_id, updates);
   
-  if (customerIndex === -1) {
+  if (!updatedCustomer) {
     throw new Error(`Customer ${customer_id} not found`);
   }
   
-  if (email) dataStore.customers[customerIndex].email = email;
-  if (phone) dataStore.customers[customerIndex].phone = phone;
-  if (first_name) dataStore.customers[customerIndex].first_name = first_name;
-  if (last_name) dataStore.customers[customerIndex].last_name = last_name;
-  
   return {
     success: true,
-    message: 'Customer updated successfully',
-    customer: dataStore.customers[customerIndex]
+    customer: updatedCustomer,
+    message: 'Customer updated successfully'
   };
 }
 
 async function cms_delete_customer(args) {
   const { customer_id } = args;
   
-  const customerIndex = dataStore.customers.findIndex(c => c.customer_id === customer_id);
+  const deleted = customerOps.delete(customer_id);
   
-  if (customerIndex === -1) {
+  if (!deleted) {
     throw new Error(`Customer ${customer_id} not found`);
   }
-  
-  // Remove customer and their cards
-  dataStore.customers.splice(customerIndex, 1);
-  dataStore.cards = dataStore.cards.filter(c => c.customer_id !== customer_id);
-  dataStore.transactions = dataStore.transactions.filter(t => t.customer_id !== customer_id);
-  dataStore.alerts = dataStore.alerts.filter(a => a.customer_id !== customer_id);
-  dataStore.disputes = dataStore.disputes.filter(d => d.customer_id !== customer_id);
   
   return {
     success: true,
@@ -382,22 +163,9 @@ async function cms_search_customers(args) {
 // ========================================
 
 async function cms_get_cards(args) {
-  const { limit = 20, offset = 0, customer_id = '', status = '', card_type = '' } = args;
+  const { customer_id, status, card_type, limit = 20, offset = 0 } = args;
   
-  let filtered = [...dataStore.cards];
-  
-  if (customer_id) {
-    filtered = filtered.filter(c => c.customer_id === customer_id);
-  }
-  
-  if (status) {
-    filtered = filtered.filter(c => c.card_status.toLowerCase() === status.toLowerCase());
-  }
-  
-  if (card_type) {
-    filtered = filtered.filter(c => c.card_type.toLowerCase() === card_type.toLowerCase());
-  }
-  
+  const filtered = cardOps.getAll({ customer_id, card_status: status, card_type });
   const paginated = filtered.slice(offset, offset + limit);
   
   return {
@@ -412,7 +180,7 @@ async function cms_get_cards(args) {
 async function cms_get_card(args) {
   const { card_id } = args;
   
-  const card = dataStore.cards.find(c => c.card_id === card_id);
+  const card = cardOps.getById(card_id);
   
   if (!card) {
     throw new Error(`Card ${card_id} not found`);
@@ -425,178 +193,192 @@ async function cms_get_card(args) {
 }
 
 async function cms_create_card(args) {
-  const { customer_id, card_type, credit_limit } = args;
+  const {
+    customer_id,
+    card_type = 'DEBIT',
+    credit_limit,
+    daily_limit,
+    monthly_limit
+  } = args;
   
-  const customer = dataStore.customers.find(c => c.customer_id === customer_id);
-  
+  // Verify customer exists
+  const customer = customerOps.getById(customer_id);
   if (!customer) {
     throw new Error(`Customer ${customer_id} not found`);
   }
   
-  const lastFour = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-  const fullNumber = card_type === 'CREDIT' ? `5500 0000 0000 ${lastFour}` : `4111 1111 1111 ${lastFour}`;
+  // Generate card data
+  const lastFour = String(Math.floor(Math.random() * 9000) + 1000);
+  const cardNumberPrefix = card_type === 'CREDIT' ? '5500' : (card_type === 'DEBIT' ? '4111' : '6011');
   
-  const newCard = {
-    card_id: generateId('card'),
+  const newCard = cardOps.create({
     customer_id,
-    customer_name: `${customer.first_name} ${customer.last_name}`,
+    customer_name: customer.customer_type === 'BUSINESS' 
+      ? customer.business_name 
+      : `${customer.first_name} ${customer.last_name}`,
     card_number: `**** **** **** ${lastFour}`,
-    full_card_number: fullNumber,
-    card_type: card_type || 'DEBIT',
-    card_status: 'ACTIVE',
-    expiry_date: '12/28',
+    full_card_number: `${cardNumberPrefix} 1111 1111 ${lastFour}`,
+    card_type,
+    card_status: 'PENDING_ACTIVATION',
+    expiry_date: `12/${String(new Date().getFullYear() + 3).slice(-2)}`,
     cvv: String(Math.floor(Math.random() * 900) + 100),
     balance: 0,
-    credit_limit: credit_limit || (card_type === 'CREDIT' ? 10000 : 5000),
-    daily_limit: card_type === 'CREDIT' ? 2000 : 1000,
-    monthly_limit: card_type === 'CREDIT' ? 10000 : 5000,
+    credit_limit: credit_limit || (card_type === 'CREDIT' ? 5000 : 1000),
+    available_credit: credit_limit || (card_type === 'CREDIT' ? 5000 : 1000),
+    daily_limit: daily_limit || 1000,
+    monthly_limit: monthly_limit || 5000,
     is_locked: false,
-    created_at: new Date().toISOString(),
-    last_used: null
-  };
-  
-  dataStore.cards.push(newCard);
+    card_controls: {
+      international_enabled: true,
+      online_enabled: true,
+      contactless_enabled: true,
+      atm_enabled: card_type !== 'CREDIT',
+      daily_limit: daily_limit || 1000,
+      transaction_limit: 500,
+    },
+  });
   
   return {
     success: true,
-    message: 'Card created successfully',
-    card: newCard
+    card: newCard,
+    message: 'Card created successfully'
   };
 }
 
 async function cms_update_card(args) {
-  const { card_id, status, daily_limit, monthly_limit } = args;
+  const { card_id, ...updates } = args;
   
-  const cardIndex = dataStore.cards.findIndex(c => c.card_id === card_id);
+  const updatedCard = cardOps.update(card_id, updates);
   
-  if (cardIndex === -1) {
+  if (!updatedCard) {
     throw new Error(`Card ${card_id} not found`);
   }
   
-  if (status) dataStore.cards[cardIndex].card_status = status;
-  if (daily_limit) dataStore.cards[cardIndex].daily_limit = daily_limit;
-  if (monthly_limit) dataStore.cards[cardIndex].monthly_limit = monthly_limit;
-  
   return {
     success: true,
-    message: 'Card updated successfully',
-    card: dataStore.cards[cardIndex]
+    card: updatedCard,
+    message: 'Card updated successfully'
   };
 }
 
 async function cms_delete_card(args) {
   const { card_id } = args;
   
-  const cardIndex = dataStore.cards.findIndex(c => c.card_id === card_id);
+  const deleted = cardOps.delete(card_id);
   
-  if (cardIndex === -1) {
+  if (!deleted) {
     throw new Error(`Card ${card_id} not found`);
   }
   
-  // Mark card as CANCELLED (soft delete)
-  dataStore.cards[cardIndex].card_status = 'CANCELLED';
-  
   return {
     success: true,
-    message: `Card ${card_id} has been cancelled`,
-    card: dataStore.cards[cardIndex]
+    message: `Card ${card_id} deleted successfully`
   };
 }
 
 async function cms_lock_card(args) {
   const { card_id, reason } = args;
   
-  const cardIndex = dataStore.cards.findIndex(c => c.card_id === card_id);
-  
-  if (cardIndex === -1) {
+  const card = cardOps.getById(card_id);
+  if (!card) {
     throw new Error(`Card ${card_id} not found`);
   }
   
-  dataStore.cards[cardIndex].is_locked = true;
-  dataStore.cards[cardIndex].card_status = 'LOCKED';
+  const updatedCard = cardOps.update(card_id, {
+    card_status: 'LOCKED',
+    is_locked: true,
+    lock_reason: reason || 'Locked by user'
+  });
   
   return {
     success: true,
-    message: `Card ${card_id} locked successfully`,
-    reason: reason || 'Manual lock',
-    card: dataStore.cards[cardIndex]
+    card: updatedCard,
+    message: `Card ${card_id} locked successfully`
   };
 }
 
 async function cms_unlock_card(args) {
   const { card_id } = args;
   
-  const cardIndex = dataStore.cards.findIndex(c => c.card_id === card_id);
-  
-  if (cardIndex === -1) {
+  const card = cardOps.getById(card_id);
+  if (!card) {
     throw new Error(`Card ${card_id} not found`);
   }
   
-  dataStore.cards[cardIndex].is_locked = false;
-  dataStore.cards[cardIndex].card_status = 'ACTIVE';
+  const updatedCard = cardOps.update(card_id, {
+    card_status: 'ACTIVE',
+    is_locked: false,
+    lock_reason: null
+  });
   
   return {
     success: true,
-    message: `Card ${card_id} unlocked successfully`,
-    card: dataStore.cards[cardIndex]
+    card: updatedCard,
+    message: `Card ${card_id} unlocked successfully`
   };
 }
 
 async function cms_update_card_controls(args) {
-  const { card_id, daily_limit, monthly_limit, allowed_categories, blocked_merchants } = args;
+  const { 
+    card_id,
+    international_enabled,
+    online_enabled,
+    contactless_enabled,
+    atm_enabled,
+    daily_limit,
+    transaction_limit
+  } = args;
   
-  const cardIndex = dataStore.cards.findIndex(c => c.card_id === card_id);
-  
-  if (cardIndex === -1) {
+  const card = cardOps.getById(card_id);
+  if (!card) {
     throw new Error(`Card ${card_id} not found`);
   }
   
-  if (daily_limit) dataStore.cards[cardIndex].daily_limit = daily_limit;
-  if (monthly_limit) dataStore.cards[cardIndex].monthly_limit = monthly_limit;
+  const updatedControls = {
+    ...card.card_controls,
+    ...(international_enabled !== undefined && { international_enabled }),
+    ...(online_enabled !== undefined && { online_enabled }),
+    ...(contactless_enabled !== undefined && { contactless_enabled }),
+    ...(atm_enabled !== undefined && { atm_enabled }),
+    ...(daily_limit !== undefined && { daily_limit }),
+    ...(transaction_limit !== undefined && { transaction_limit }),
+  };
+  
+  const updatedCard = cardOps.update(card_id, { card_controls: updatedControls });
   
   return {
     success: true,
-    message: 'Card controls updated successfully',
-    controls: {
-      card_id,
-      daily_limit: dataStore.cards[cardIndex].daily_limit,
-      monthly_limit: dataStore.cards[cardIndex].monthly_limit,
-      allowed_categories: allowed_categories || [],
-      blocked_merchants: blocked_merchants || []
-    }
+    card: updatedCard,
+    message: 'Card controls updated successfully'
   };
 }
 
 // ========================================
-// Transaction Management Handlers
+// Transaction Handlers
 // ========================================
 
 async function cms_get_transactions(args) {
-  const { limit = 50, offset = 0, card_id = '', customer_id = '', status = '' } = args;
+  const { card_id, start_date, end_date, limit = 50, offset = 0 } = args;
   
-  let filtered = [...dataStore.transactions];
+  let transactions = getTransactions().filter(t => t.card_id === card_id);
   
-  if (card_id) {
-    filtered = filtered.filter(t => t.card_id === card_id);
+  if (start_date) {
+    transactions = transactions.filter(t => new Date(t.transaction_date) >= new Date(start_date));
   }
   
-  if (customer_id) {
-    filtered = filtered.filter(t => t.customer_id === customer_id);
-  }
-  
-  if (status) {
-    filtered = filtered.filter(t => t.transaction_status.toLowerCase() === status.toLowerCase());
+  if (end_date) {
+    transactions = transactions.filter(t => new Date(t.transaction_date) <= new Date(end_date));
   }
   
   // Sort by date descending
-  filtered.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
+  transactions.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
   
-  const paginated = filtered.slice(offset, offset + limit);
+  const paginated = transactions.slice(offset, offset + limit);
   
   return {
     success: true,
     transactions: paginated,
-    total: filtered.length,
+    total: transactions.length,
     limit,
     offset
   };
@@ -605,7 +387,7 @@ async function cms_get_transactions(args) {
 async function cms_get_transaction(args) {
   const { transaction_id } = args;
   
-  const transaction = dataStore.transactions.find(t => t.transaction_id === transaction_id);
+  const transaction = getTransactions().find(t => t.transaction_id === transaction_id);
   
   if (!transaction) {
     throw new Error(`Transaction ${transaction_id} not found`);
@@ -618,73 +400,94 @@ async function cms_get_transaction(args) {
 }
 
 async function cms_search_transactions(args) {
-  return cms_get_transactions(args);
-}
-
-// ========================================
-// Alert Management Handlers
-// ========================================
-
-async function cms_get_alerts(args) {
-  const { limit = 20, offset = 0, customer_id = '', severity = '', status = '' } = args;
+  const { card_id, query, min_amount, max_amount, limit = 50 } = args;
   
-  let filtered = [...dataStore.alerts];
+  let transactions = getTransactions().filter(t => t.card_id === card_id);
   
-  if (customer_id) {
-    filtered = filtered.filter(a => a.customer_id === customer_id);
+  if (query) {
+    const searchLower = query.toLowerCase();
+    transactions = transactions.filter(t =>
+      t.merchant_name.toLowerCase().includes(searchLower) ||
+      t.merchant_category.toLowerCase().includes(searchLower)
+    );
   }
   
-  if (severity) {
-    filtered = filtered.filter(a => a.severity.toLowerCase() === severity.toLowerCase());
+  if (min_amount !== undefined) {
+    transactions = transactions.filter(t => Math.abs(t.amount) >= min_amount);
   }
   
-  if (status) {
-    filtered = filtered.filter(a => a.alert_status.toLowerCase() === status.toLowerCase());
+  if (max_amount !== undefined) {
+    transactions = transactions.filter(t => Math.abs(t.amount) <= max_amount);
   }
   
   // Sort by date descending
-  filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  transactions.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
   
-  const paginated = filtered.slice(offset, offset + limit);
+  return {
+    success: true,
+    transactions: transactions.slice(0, limit),
+    total: transactions.length
+  };
+}
+
+// ========================================
+// Alert Handlers
+// ========================================
+
+async function cms_get_alerts(args) {
+  const { customer_id, unread_only, alert_type, limit = 50, offset = 0 } = args;
+  
+  let alerts = getAlerts();
+  
+  if (customer_id) {
+    alerts = alerts.filter(a => a.customer_id === customer_id);
+  }
+  
+  if (unread_only) {
+    alerts = alerts.filter(a => !a.is_read);
+  }
+  
+  if (alert_type) {
+    alerts = alerts.filter(a => a.alert_type === alert_type);
+  }
+  
+  // Sort by created_at descending
+  alerts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  
+  const paginated = alerts.slice(offset, offset + limit);
   
   return {
     success: true,
     alerts: paginated,
-    total: filtered.length,
-    limit,
-    offset
+    total: alerts.length,
+    unread_count: alerts.filter(a => !a.is_read).length
   };
 }
 
 async function cms_mark_alert_read(args) {
   const { alert_id } = args;
   
-  const alertIndex = dataStore.alerts.findIndex(a => a.alert_id === alert_id);
+  const alerts = getAlerts();
+  const alert = alerts.find(a => a.alert_id === alert_id);
   
-  if (alertIndex === -1) {
+  if (!alert) {
     throw new Error(`Alert ${alert_id} not found`);
   }
   
-  dataStore.alerts[alertIndex].alert_status = 'READ';
-  dataStore.alerts[alertIndex].status = 'READ';
-  dataStore.alerts[alertIndex].is_read = true;
+  alert.is_read = true;
+  alert.read_at = new Date().toISOString();
   
   return {
     success: true,
-    message: `Alert ${alert_id} marked as read`,
-    alert: dataStore.alerts[alertIndex]
+    alert,
+    message: 'Alert marked as read'
   };
 }
 
 async function cms_get_alert_preferences(args) {
   const { customer_id } = args;
   
-  const customer = dataStore.customers.find(c => c.customer_id === customer_id);
-  
-  if (!customer) {
-    throw new Error(`Customer ${customer_id} not found`);
-  }
-  
+  // For demo purposes, return default preferences
   return {
     success: true,
     preferences: {
@@ -692,99 +495,115 @@ async function cms_get_alert_preferences(args) {
       email_enabled: true,
       sms_enabled: true,
       push_enabled: true,
-      alert_types: ['FRAUD_DETECTED', 'LARGE_TRANSACTION', 'CARD_DECLINED']
+      alert_types: {
+        TRANSACTION: true,
+        FRAUD: true,
+        SECURITY: true,
+        CARD_STATUS: true,
+        SYSTEM: false,
+        PROMOTION: true
+      }
     }
   };
 }
 
 async function cms_update_alert_preferences(args) {
-  const { customer_id, email_enabled, sms_enabled, push_enabled } = args;
+  const {
+    customer_id,
+    email_enabled,
+    sms_enabled,
+    push_enabled,
+    alert_types
+  } = args;
   
-  const customer = dataStore.customers.find(c => c.customer_id === customer_id);
-  
-  if (!customer) {
-    throw new Error(`Customer ${customer_id} not found`);
-  }
-  
+  // For demo purposes, just return the updated preferences
   return {
     success: true,
-    message: 'Alert preferences updated successfully',
     preferences: {
       customer_id,
       email_enabled: email_enabled !== undefined ? email_enabled : true,
       sms_enabled: sms_enabled !== undefined ? sms_enabled : true,
-      push_enabled: push_enabled !== undefined ? push_enabled : true
-    }
+      push_enabled: push_enabled !== undefined ? push_enabled : true,
+      alert_types: alert_types || {}
+    },
+    message: 'Alert preferences updated successfully'
   };
 }
 
 // ========================================
-// Dispute Management Handlers
+// Dispute Handlers
 // ========================================
 
 async function cms_create_dispute(args) {
-  const { transaction_id, reason, description } = args;
+  const {
+    transaction_id,
+    dispute_type,
+    reason,
+    amount,
+    evidence_description
+  } = args;
   
-  const transaction = dataStore.transactions.find(t => t.transaction_id === transaction_id);
-  
+  const transaction = getTransactions().find(t => t.transaction_id === transaction_id);
   if (!transaction) {
     throw new Error(`Transaction ${transaction_id} not found`);
   }
   
+  // Find customer via card
+  const card = getCards().find(c => c.card_id === transaction.card_id);
+  const customer_id = card?.customer_id;
+  
   const newDispute = {
-    dispute_id: generateId('dispute'),
+    dispute_id: uuidv4(),
     transaction_id,
-    customer_id: transaction.customer_id,
-    card_id: transaction.card_id,
-    amount: Math.abs(transaction.amount),
+    customer_id,
+    dispute_type,
     reason,
-    description,
-    dispute_status: 'PENDING',
+    amount: amount || Math.abs(transaction.amount),
+    evidence_description,
     status: 'PENDING',
     created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
     resolution: null
   };
   
-  dataStore.disputes.push(newDispute);
+  getDisputes().push(newDispute);
   
   return {
     success: true,
-    message: 'Dispute created successfully',
-    dispute: newDispute
+    dispute: newDispute,
+    message: 'Dispute created successfully'
   };
 }
 
 async function cms_get_disputes(args) {
-  const { limit = 20, offset = 0, customer_id = '', status = '' } = args;
+  const { customer_id, status, limit = 50, offset = 0 } = args;
   
-  let filtered = [...dataStore.disputes];
+  let disputes = getDisputes();
   
   if (customer_id) {
-    filtered = filtered.filter(d => d.customer_id === customer_id);
+    disputes = disputes.filter(d => d.customer_id === customer_id);
   }
   
   if (status) {
-    filtered = filtered.filter(d => d.dispute_status.toLowerCase() === status.toLowerCase());
+    disputes = disputes.filter(d => d.status === status);
   }
   
-  // Sort by date descending
-  filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  // Sort by created_at descending
+  disputes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   
-  const paginated = filtered.slice(offset, offset + limit);
+  const paginated = disputes.slice(offset, offset + limit);
   
   return {
     success: true,
     disputes: paginated,
-    total: filtered.length,
-    limit,
-    offset
+    total: disputes.length
   };
 }
 
 async function cms_get_dispute(args) {
   const { dispute_id } = args;
   
-  const dispute = dataStore.disputes.find(d => d.dispute_id === dispute_id);
+  const dispute = getDisputes().find(d => d.dispute_id === dispute_id);
   
   if (!dispute) {
     throw new Error(`Dispute ${dispute_id} not found`);
@@ -797,26 +616,29 @@ async function cms_get_dispute(args) {
 }
 
 async function cms_update_dispute(args) {
-  const { dispute_id, status, resolution } = args;
+  const { dispute_id, additional_info, status } = args;
   
-  const disputeIndex = dataStore.disputes.findIndex(d => d.dispute_id === dispute_id);
+  const disputes = getDisputes();
+  const dispute = disputes.find(d => d.dispute_id === dispute_id);
   
-  if (disputeIndex === -1) {
+  if (!dispute) {
     throw new Error(`Dispute ${dispute_id} not found`);
   }
   
+  if (additional_info) {
+    dispute.additional_info = additional_info;
+  }
+  
   if (status) {
-    dataStore.disputes[disputeIndex].dispute_status = status;
-    dataStore.disputes[disputeIndex].status = status;
+    dispute.status = status;
   }
-  if (resolution) {
-    dataStore.disputes[disputeIndex].resolution = resolution;
-  }
+  
+  dispute.updated_at = new Date().toISOString();
   
   return {
     success: true,
-    message: 'Dispute updated successfully',
-    dispute: dataStore.disputes[disputeIndex]
+    dispute,
+    message: 'Dispute updated successfully'
   };
 }
 
@@ -825,31 +647,32 @@ async function cms_update_dispute(args) {
 // ========================================
 
 async function cms_view_pin(args) {
-  const { card_id } = args;
+  const { card_id, password } = args;
   
-  const card = dataStore.cards.find(c => c.card_id === card_id);
-  
+  const card = cardOps.getById(card_id);
   if (!card) {
     throw new Error(`Card ${card_id} not found`);
   }
   
+  // For demo purposes, return a mock PIN
+  // In production, this would require re-authentication
   return {
     success: true,
-    card_id,
-    pin: '1234',
-    message: 'PIN retrieved successfully'
+    pin: '****', // Masked for security
+    message: 'PIN retrieved successfully (masked for security)',
+    warning: 'This is a demo endpoint. In production, full PIN would require additional authentication.'
   };
 }
 
 async function cms_change_pin(args) {
-  const { card_id, new_pin } = args;
+  const { card_id, current_pin, new_pin } = args;
   
-  const card = dataStore.cards.find(c => c.card_id === card_id);
-  
+  const card = cardOps.getById(card_id);
   if (!card) {
     throw new Error(`Card ${card_id} not found`);
   }
   
+  // For demo purposes, accept any PIN change
   return {
     success: true,
     message: `PIN changed successfully for card ${card_id}`
@@ -857,46 +680,61 @@ async function cms_change_pin(args) {
 }
 
 async function cms_request_replacement(args) {
-  const { card_id, reason, shipping_address } = args;
+  const { card_id, reason, expedited = false, shipping_address } = args;
   
-  const card = dataStore.cards.find(c => c.card_id === card_id);
-  
+  const card = cardOps.getById(card_id);
   if (!card) {
     throw new Error(`Card ${card_id} not found`);
   }
   
+  // Lock the old card
+  cardOps.update(card_id, { card_status: 'CANCELLED' });
+  
+  const replacementCard = {
+    replacement_request_id: uuidv4(),
+    original_card_id: card_id,
+    reason,
+    expedited,
+    shipping_address: shipping_address || 'Customer address on file',
+    status: 'PROCESSING',
+    estimated_delivery: expedited 
+      ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
+      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date().toISOString()
+  };
+  
   return {
     success: true,
-    message: 'Card replacement requested successfully',
-    replacement: {
-      original_card_id: card_id,
-      new_card_id: generateId('card'),
-      reason,
-      shipping_address,
-      estimated_delivery: '5-7 business days'
-    }
+    replacement: replacementCard,
+    message: `Replacement card requested successfully. ${expedited ? 'Expedited' : 'Standard'} delivery.`
   };
 }
 
 async function cms_activate_card(args) {
-  const { card_id, last_four_digits } = args;
+  const { card_id, last_four_ssn } = args;
   
-  const cardIndex = dataStore.cards.findIndex(c => c.card_id === card_id);
-  
-  if (cardIndex === -1) {
+  const card = cardOps.getById(card_id);
+  if (!card) {
     throw new Error(`Card ${card_id} not found`);
   }
   
-  dataStore.cards[cardIndex].card_status = 'ACTIVE';
+  if (card.card_status !== 'PENDING_ACTIVATION') {
+    throw new Error(`Card ${card_id} is not pending activation`);
+  }
+  
+  const updatedCard = cardOps.update(card_id, { card_status: 'ACTIVE' });
   
   return {
     success: true,
-    message: `Card ${card_id} activated successfully`,
-    card: dataStore.cards[cardIndex]
+    card: updatedCard,
+    message: `Card ${card_id} activated successfully`
   };
 }
 
+// ========================================
 // Export all handlers
+// ========================================
+
 module.exports = {
   cms_get_customer,
   cms_get_customers,
@@ -926,5 +764,5 @@ module.exports = {
   cms_view_pin,
   cms_change_pin,
   cms_request_replacement,
-  cms_activate_card
+  cms_activate_card,
 };
