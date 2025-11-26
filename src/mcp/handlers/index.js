@@ -229,6 +229,32 @@ console.log(`   ⚖️  ${dataStore.disputes.length} disputes`);
 // Customer Management Handlers
 // ========================================
 
+// Get a single customer by ID
+async function cms_get_customer(args) {
+  const { customer_id } = args;
+  
+  const customer = dataStore.customers.find(c => 
+    c.customer_id.toUpperCase() === customer_id.toUpperCase()
+  );
+  
+  if (!customer) {
+    throw new Error(`Customer ${customer_id} not found`);
+  }
+  
+  // Add card counts
+  const customerCards = dataStore.cards.filter(c => c.customer_id === customer.customer_id);
+  const customerWithCounts = {
+    ...customer,
+    card_count: customerCards.length,
+    active_card_count: customerCards.filter(c => c.card_status === 'ACTIVE').length
+  };
+  
+  return {
+    success: true,
+    customer: customerWithCounts
+  };
+}
+
 async function cms_get_customers(args) {
   const { limit = 20, offset = 0, search = '', status = '' } = args;
   
@@ -872,8 +898,8 @@ async function cms_activate_card(args) {
 
 // Export all handlers
 module.exports = {
+  cms_get_customer,
   cms_get_customers,
-  cms_get_customer: cms_get_customers, // Alias for singular lookup
   cms_create_customer,
   cms_update_customer,
   cms_delete_customer,
