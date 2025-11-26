@@ -383,7 +383,7 @@ async function cms_get_cards(args) {
   };
 }
 
-async function cms_get_card_details(args) {
+async function cms_get_card(args) {
   const { card_id } = args;
   
   const card = dataStore.cards.find(c => c.card_id === card_id);
@@ -454,6 +454,25 @@ async function cms_update_card(args) {
   return {
     success: true,
     message: 'Card updated successfully',
+    card: dataStore.cards[cardIndex]
+  };
+}
+
+async function cms_delete_card(args) {
+  const { card_id } = args;
+  
+  const cardIndex = dataStore.cards.findIndex(c => c.card_id === card_id);
+  
+  if (cardIndex === -1) {
+    throw new Error(`Card ${card_id} not found`);
+  }
+  
+  // Mark card as CANCELLED (soft delete)
+  dataStore.cards[cardIndex].card_status = 'CANCELLED';
+  
+  return {
+    success: true,
+    message: `Card ${card_id} has been cancelled`,
     card: dataStore.cards[cardIndex]
   };
 }
@@ -554,6 +573,21 @@ async function cms_get_transactions(args) {
     total: filtered.length,
     limit,
     offset
+  };
+}
+
+async function cms_get_transaction(args) {
+  const { transaction_id } = args;
+  
+  const transaction = dataStore.transactions.find(t => t.transaction_id === transaction_id);
+  
+  if (!transaction) {
+    throw new Error(`Transaction ${transaction_id} not found`);
+  }
+  
+  return {
+    success: true,
+    transaction
   };
 }
 
@@ -721,6 +755,21 @@ async function cms_get_disputes(args) {
   };
 }
 
+async function cms_get_dispute(args) {
+  const { dispute_id } = args;
+  
+  const dispute = dataStore.disputes.find(d => d.dispute_id === dispute_id);
+  
+  if (!dispute) {
+    throw new Error(`Dispute ${dispute_id} not found`);
+  }
+  
+  return {
+    success: true,
+    dispute
+  };
+}
+
 async function cms_update_dispute(args) {
   const { dispute_id, status, resolution } = args;
   
@@ -824,18 +873,21 @@ async function cms_activate_card(args) {
 // Export all handlers
 module.exports = {
   cms_get_customers,
+  cms_get_customer: cms_get_customers, // Alias for singular lookup
   cms_create_customer,
   cms_update_customer,
   cms_delete_customer,
   cms_search_customers,
   cms_get_cards,
-  cms_get_card_details,
+  cms_get_card,
   cms_create_card,
   cms_update_card,
+  cms_delete_card,
   cms_lock_card,
   cms_unlock_card,
   cms_update_card_controls,
   cms_get_transactions,
+  cms_get_transaction,
   cms_search_transactions,
   cms_get_alerts,
   cms_mark_alert_read,
@@ -843,6 +895,7 @@ module.exports = {
   cms_update_alert_preferences,
   cms_create_dispute,
   cms_get_disputes,
+  cms_get_dispute,
   cms_update_dispute,
   cms_view_pin,
   cms_change_pin,

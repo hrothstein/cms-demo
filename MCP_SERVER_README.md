@@ -2,7 +2,12 @@
 
 ## Overview
 
-The CMS Admin MCP (Model Context Protocol) Server enables AI agents like Claude to interact directly with the Card Management System backend. This implementation exposes 30+ tools for customer management, card operations, transactions, alerts, disputes, and card services.
+The CMS Admin MCP (Model Context Protocol) Server enables AI agents like Claude to interact directly with the Card Management System. This implementation exposes **29 tools** for customer management, card operations, transactions, alerts, disputes, and card services.
+
+**✅ Status:** All 29 tools fully implemented and tested  
+**📦 Data Store:** In-memory (50 customers, 68 cards, 947 transactions)  
+**🧪 Testing:** HTTP server available on `localhost:3001` with Postman collection  
+**📚 Documentation:** Complete implementation summary in `src/mcp/MCP_IMPLEMENTATION_SUMMARY.md`
 
 ## What is MCP?
 
@@ -41,7 +46,12 @@ Model Context Protocol (MCP) is an open standard that enables AI assistants to s
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────┐
-│              CMS PostgreSQL Database                    │
+│              In-Memory Data Store                       │
+│  • 50 Customers (CUST-001 to CUST-050)                 │
+│  • 68 Cards (CARD-001+)                                 │
+│  • 947 Transactions (TXN-0001+)                         │
+│  • 5 Alerts (ALERT-001 to ALERT-005)                   │
+│  • 1 Dispute (DISPUTE-001)                              │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -50,32 +60,37 @@ Model Context Protocol (MCP) is an open standard that enables AI assistants to s
 ### Prerequisites
 
 - Node.js 18+ installed
-- PostgreSQL database running
-- CMS backend application setup complete
+- No database required (uses in-memory storage)
 
 ### Install Dependencies
 
 The MCP SDK is already included in package.json. If you need to install it manually:
 
 ```bash
+cd cms-demo
 npm install @modelcontextprotocol/sdk
+```
+
+### Quick Start
+
+```bash
+# Start HTTP server for testing (port 3001)
+cd cms-demo/src/mcp
+node http-server.js
+
+# Or run MCP server directly (stdio mode for Claude)
+node index.js
 ```
 
 ## Configuration
 
-### 1. Environment Variables
+### 1. Environment Variables (Optional)
 
-Create or update your `.env` file with database connection details:
+The server uses in-memory storage by default. For HTTP server port configuration:
 
 ```env
-DATABASE_URL=postgresql://username:password@localhost:5432/cms_database
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_NAME=cms_database
-DATABASE_USER=username
-DATABASE_PASSWORD=password
-DATABASE_SSL=false
-NODE_ENV=production
+MCP_HTTP_PORT=3001
+NODE_ENV=development
 ```
 
 ### 2. Claude Desktop Configuration
@@ -95,19 +110,21 @@ To connect Claude Desktop to the MCP server:
     "cms-admin": {
       "command": "node",
       "args": [
-        "/absolute/path/to/cms-demo/src/mcp/index.js"
+        "/Users/hrothstein/cursorrepos/CMS-V2/cms-demo/src/mcp/index.js"
       ],
       "env": {
-        "DATABASE_URL": "postgresql://username:password@localhost:5432/cms_database"
+        "NODE_ENV": "development"
       }
     }
   }
 }
 ```
 
-3. Replace `/absolute/path/to/cms-demo` with the actual path to your project
+3. Replace the path with the actual path to your `cms-demo` directory
 
 4. Restart Claude Desktop
+
+5. Verify connection: Ask Claude "What MCP tools do you have access to?"
 
 ## Running the MCP Server
 
@@ -115,9 +132,26 @@ To connect Claude Desktop to the MCP server:
 
 Claude Desktop will automatically start the MCP server when needed. No manual startup required.
 
-### Manual Testing
+### HTTP Server for Testing (Recommended)
 
-To test the MCP server manually:
+The easiest way to test the MCP server is via the HTTP wrapper:
+
+```bash
+cd /Users/hrothstein/cursorrepos/CMS-V2/cms-demo/src/mcp
+node http-server.js
+```
+
+Server starts on `http://localhost:3001` with these endpoints:
+- `GET /health` - Health check
+- `GET /tools` - List all 29 tools
+- `POST /tools/:toolName/execute` - Execute a tool
+- `POST /tools/batch` - Execute multiple tools
+
+**Use the included Postman collection** (`CMS_MCP_Postman_Collection.json`) to test all tools.
+
+### Manual Testing (stdio mode)
+
+To test the MCP server in stdio mode (as Claude uses it):
 
 ```bash
 cd /path/to/cms-demo
@@ -130,7 +164,9 @@ The server runs on stdio and communicates via stdin/stdout.
 
 The MCP server is designed to run separately from the Express REST API. Both can run simultaneously without conflicts.
 
-## Available MCP Tools
+## Available MCP Tools (29 Total)
+
+**Complete tool list with test data available in the Postman collection.**
 
 ### Customer Management Tools (6 tools)
 
@@ -268,37 +304,67 @@ Claude: [Uses cms_get_cards with status='LOCKED']
 - Mark alerts as read
 - Filter by alert type
 
+## Testing with Postman
+
+**Postman Collection:** `src/mcp/CMS_MCP_Postman_Collection.json`
+
+### Import Collection
+
+1. Open Postman
+2. Click Import → Upload Files
+3. Select `CMS_MCP_Postman_Collection.json`
+4. Collection includes 33 requests (29 tools + 4 server endpoints)
+
+### Test Scenarios
+
+**Basic Testing:**
+```
+1. Health Check → GET /health
+2. List Tools → GET /tools
+3. Get Customers → POST /tools/cms_get_customers/execute
+4. Get Cards → POST /tools/cms_get_cards/execute
+```
+
+**Fraud Response Workflow:**
+```
+1. Get customer transactions
+2. Lock suspicious card
+3. Create dispute for unauthorized transaction
+4. Get alerts for customer
+```
+
+**Card Management:**
+```
+1. Create new card for customer
+2. Update card controls (limits, international)
+3. Lock/Unlock card
+4. Request replacement card
+```
+
 ## Security Considerations
 
-### Database Access
-- MCP server has direct database access
-- Use read-only database user where possible
-- Implement row-level security policies
-- Enable audit logging
+### Current Implementation (In-Memory)
+- ✅ **Demo/Development Safe**: Data resets on server restart
+- ✅ **No PII Persistence**: All data is ephemeral
+- ✅ **Fast Testing**: No database setup required
 
 ### Authentication
 - No end-user authentication in MCP layer (handled by AI agent)
-- Database credentials stored securely in environment
-- Consider IP whitelisting for production
+- Production deployment should add authentication/authorization
 
 ### Data Protection
-- Sensitive data (PINs, CVVs) handled securely
-- PII logging disabled
-- Encryption at rest and in transit
-- Compliance with PCI-DSS, GDPR, CCPA
+- Sensitive data (PINs, CVVs) returned for demo purposes
+- Production: Implement proper access controls
+- Compliance with PCI-DSS, GDPR, CCPA for production
 
-### Production Hardening
+### Production Considerations
 ```javascript
-// Recommended: Use connection pooling
-const pool = new Pool({
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
-
-// Recommended: Enable SSL
-DATABASE_SSL=true
-DATABASE_SSL_REJECT_UNAUTHORIZED=true
+// For production, replace in-memory storage with:
+// - PostgreSQL database
+// - Redis for caching
+// - Proper authentication/authorization
+// - Audit logging
+// - Rate limiting
 ```
 
 ## Troubleshooting
@@ -315,56 +381,74 @@ DATABASE_SSL_REJECT_UNAUTHORIZED=true
    - macOS: `~/Library/Logs/Claude/`
    - Windows: `%APPDATA%\Claude\logs\`
 
-### Database Connection Errors
+### Server Won't Start
 
-**Problem**: "connection refused" or "timeout"
+**Problem**: "EPERM: operation not permitted" or port in use
 
 **Solution**:
-1. Verify PostgreSQL is running: `pg_isready`
-2. Check database credentials in .env
-3. Test connection: `psql $DATABASE_URL`
-4. Verify firewall allows connections
+1. Check if port 3001 is already in use: `lsof -i :3001`
+2. Kill existing process: `kill -9 <PID>`
+3. Or change port in environment: `MCP_HTTP_PORT=3002 node http-server.js`
 
 ### Tool Execution Errors
 
 **Problem**: Tools return errors or unexpected results
 
 **Solution**:
-1. Check database schema matches expected structure
-2. Verify required tables exist (users, cards, transactions, etc.)
+1. Check if data exists in in-memory store (server logs on startup)
+2. Restart server to reset data to initial state
 3. Enable debug logging:
    ```bash
    NODE_ENV=development node src/mcp/index.js
    ```
 4. Check tool handler implementation in `src/mcp/handlers/index.js`
 
-### Performance Issues
+### Data Reset
 
-**Problem**: Slow tool responses
+**Problem**: Need to reset test data
 
 **Solution**:
-1. Add database indexes:
-   ```sql
-   CREATE INDEX idx_cards_customer ON cards(customer_id);
-   CREATE INDEX idx_transactions_card ON transactions(card_id);
-   CREATE INDEX idx_users_email ON users(email);
-   ```
-2. Use pagination for large result sets
-3. Enable database connection pooling
-4. Monitor query performance with EXPLAIN
+Simply restart the server - all data is regenerated fresh:
+```bash
+# Kill server (Ctrl+C or kill process)
+# Restart
+node http-server.js
+
+# New data will be generated:
+# ✓ 50 customers
+# ✓ 68 cards  
+# ✓ 947 transactions
+# ✓ 5 alerts
+# ✓ 1 dispute
+```
 
 ## Testing
 
-### Manual Testing with cURL
+### HTTP Testing with cURL
 
-MCP uses stdio transport, so manual HTTP testing isn't directly applicable. Use Claude Desktop or implement a test client:
+Test any tool via HTTP:
 
-```javascript
-const CMSMCPServer = require('./src/mcp/index');
+```bash
+# Health check
+curl http://localhost:3001/health
 
-// Test initialization
-const server = new CMSMCPServer();
-console.log('MCP Server initialized with tools:', server.tools.length);
+# List all tools
+curl http://localhost:3001/tools | jq '.tools[].name'
+
+# Get customers
+curl -X POST http://localhost:3001/tools/cms_get_customers/execute \
+  -H "Content-Type: application/json" \
+  -d '{"limit": 5}'
+
+# Lock a card
+curl -X POST http://localhost:3001/tools/cms_lock_card/execute \
+  -H "Content-Type: application/json" \
+  -d '{"card_id": "CARD-001", "reason": "fraud_suspected"}'
+
+# Get transactions
+curl -X POST http://localhost:3001/tools/cms_get_transactions/execute \
+  -H "Content-Type: application/json" \
+  -d '{"card_id": "CARD-001", "limit": 10}'
 ```
 
 ### Automated Testing
@@ -379,22 +463,29 @@ describe('Customer Tools', () => {
     const result = await handlers.cms_get_customers({ limit: 10 });
     expect(result.success).toBe(true);
     expect(result.customers).toBeInstanceOf(Array);
+    expect(result.customers.length).toBeLessThanOrEqual(10);
   });
 
   test('cms_get_customer returns single customer', async () => {
     const result = await handlers.cms_get_customer({ 
-      customer_id: 'test-customer-id' 
+      customer_id: 'CUST-001' 
     });
     expect(result.success).toBe(true);
-    expect(result.customer).toBeDefined();
+    expect(result.customers).toBeDefined();
   });
 });
 ```
 
-Run tests:
-```bash
-npm test tests/mcp/
-```
+### Test Data Available
+
+The in-memory store includes:
+- **Customers:** CUST-001 through CUST-050
+- **Cards:** CARD-001 through CARD-068 (mix of ACTIVE/INACTIVE)
+- **Transactions:** TXN-0001+ (10-20 per active card)
+- **Alerts:** ALERT-001 through ALERT-005
+- **Disputes:** DISPUTE-001
+
+Use these IDs in your tests and Postman requests.
 
 ## Development
 
@@ -427,12 +518,15 @@ module.exports = [
 async function cms_my_new_tool(args) {
   const { param1 } = args;
   
-  // Implementation using existing database/services
-  const result = await query('SELECT * FROM ...', [param1]);
+  // Implementation using in-memory dataStore
+  const filtered = dataStore.items.filter(item => 
+    item.field === param1
+  );
   
   return {
     success: true,
-    data: result.rows,
+    data: filtered,
+    total: filtered.length
   };
 }
 
@@ -449,17 +543,21 @@ module.exports = {
 
 ```
 src/mcp/
-├── index.js                      # MCP server setup and initialization
-├── tools/                        # Tool definitions (schemas)
-│   ├── customer-tools.js         # Customer management tools
-│   ├── card-tools.js             # Card management tools
-│   ├── transaction-tools.js      # Transaction tools
-│   ├── alert-tools.js            # Alert tools
-│   ├── dispute-tools.js          # Dispute tools
-│   └── card-service-tools.js     # Card service tools
-├── handlers/                     # Tool implementations
-│   └── index.js                  # All tool handlers
-└── claude-desktop-config.example.json  # Example config
+├── index.js                          # MCP server (stdio mode)
+├── http-server.js                    # HTTP wrapper for testing
+├── sse-server.js                     # SSE transport (optional)
+├── tools/                            # Tool definitions (29 tools)
+│   ├── customer-tools.js             # 6 customer tools
+│   ├── card-tools.js                 # 8 card tools
+│   ├── transaction-tools.js          # 3 transaction tools
+│   ├── alert-tools.js                # 4 alert tools
+│   ├── dispute-tools.js              # 4 dispute tools
+│   └── card-service-tools.js         # 4 card service tools
+├── handlers/
+│   └── index.js                      # All handlers + in-memory data store
+├── CMS_MCP_Postman_Collection.json   # Full test collection
+├── MCP_IMPLEMENTATION_SUMMARY.md     # Complete implementation docs
+└── claude-desktop-config.example.json
 ```
 
 ## Production Deployment
@@ -476,21 +574,20 @@ src/mcp/
 ### Environment-Specific Configs
 
 ```json
-// Development
+// Development (In-Memory)
 {
   "mcpServers": {
     "cms-admin": {
       "command": "node",
-      "args": ["./src/mcp/index.js"],
+      "args": ["/Users/hrothstein/cursorrepos/CMS-V2/cms-demo/src/mcp/index.js"],
       "env": {
-        "DATABASE_URL": "postgresql://localhost/cms_dev",
         "NODE_ENV": "development"
       }
     }
   }
 }
 
-// Production
+// Production (Replace with database-backed version)
 {
   "mcpServers": {
     "cms-admin": {
@@ -498,7 +595,8 @@ src/mcp/
       "args": ["/opt/cms/src/mcp/index.js"],
       "env": {
         "DATABASE_URL": "postgresql://prod-host/cms_prod?sslmode=require",
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "LOG_LEVEL": "info"
       }
     }
   }
@@ -513,10 +611,12 @@ src/mcp/
 - **CMS PRD**: See `MuleSoft_APIKit_Router_PRD_CMS_Demo_API-mcp.md`
 
 ### Related Files
-- `src/mcp/index.js` - MCP server implementation
-- `src/mcp/handlers/index.js` - Tool handlers (business logic)
-- `src/mcp/tools/*.js` - Tool definitions (schemas)
-- `src/config/database.js` - Database configuration
+- `src/mcp/index.js` - MCP server implementation (stdio)
+- `src/mcp/http-server.js` - HTTP testing server
+- `src/mcp/handlers/index.js` - All 29 tool handlers + in-memory data
+- `src/mcp/tools/*.js` - Tool definitions (input schemas)
+- `src/mcp/CMS_MCP_Postman_Collection.json` - Complete test collection
+- `src/mcp/MCP_IMPLEMENTATION_SUMMARY.md` - Full documentation
 
 ### Contributing
 

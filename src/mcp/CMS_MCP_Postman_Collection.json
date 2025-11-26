@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "CMS MCP Server API",
-    "description": "Test collection for CMS MCP Server - All 29 AI Agent Tools",
+    "description": "Complete test collection for CMS MCP Server - All 29 AI Agent Tools for Financial Services Card Management",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -108,27 +108,63 @@
               "path": ["tools", "cms_search_customers", "execute"]
             }
           }
-        },
-        {
-          "name": "Create Customer",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"test.user\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Test123!\",\n  \"phone\": \"+1-555-0199\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:3001/tools/cms_create_customer/execute",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3001",
-              "path": ["tools", "cms_create_customer", "execute"]
-            }
+      },
+      {
+        "name": "Create Customer",
+        "request": {
+          "method": "POST",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"test.user\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Test123!\",\n  \"phone\": \"+1-555-0199\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3001/tools/cms_create_customer/execute",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3001",
+            "path": ["tools", "cms_create_customer", "execute"]
           }
         }
-      ]
-    },
+      },
+      {
+        "name": "Update Customer",
+        "request": {
+          "method": "POST",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"customer_id\": \"CUST-001\",\n  \"email\": \"updated@example.com\",\n  \"phone\": \"+1-555-9999\",\n  \"first_name\": \"Updated\",\n  \"last_name\": \"Name\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3001/tools/cms_update_customer/execute",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3001",
+            "path": ["tools", "cms_update_customer", "execute"]
+          }
+        }
+      },
+      {
+        "name": "Delete Customer",
+        "request": {
+          "method": "POST",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"customer_id\": \"CUST-050\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3001/tools/cms_delete_customer/execute",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3001",
+            "path": ["tools", "cms_delete_customer", "execute"]
+          }
+        }
+      }
+    ]
+  },
     {
       "name": "Card Management",
       "item": [
@@ -157,7 +193,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"card_id\": \"CRD-0001\"\n}"
+              "raw": "{\n  \"card_id\": \"CARD-001\"\n}"
             },
             "url": {
               "raw": "http://localhost:3001/tools/cms_get_card/execute",
@@ -175,7 +211,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"reason\": \"fraud_suspected\",\n  \"notes\": \"Testing lock via Postman\"\n}"
+              "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"reason\": \"fraud_suspected\",\n  \"notes\": \"Testing lock via Postman\"\n}"
             },
             "url": {
               "raw": "http://localhost:3001/tools/cms_lock_card/execute",
@@ -193,7 +229,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"notes\": \"Testing unlock via Postman\"\n}"
+              "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"notes\": \"Testing unlock via Postman\"\n}"
             },
             "url": {
               "raw": "http://localhost:3001/tools/cms_unlock_card/execute",
@@ -203,27 +239,81 @@
               "path": ["tools", "cms_unlock_card", "execute"]
             }
           }
-        },
-        {
-          "name": "Update Card Controls",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"international_enabled\": false,\n  \"online_enabled\": true,\n  \"daily_limit\": 500\n}"
-            },
-            "url": {
-              "raw": "http://localhost:3001/tools/cms_update_card_controls/execute",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3001",
-              "path": ["tools", "cms_update_card_controls", "execute"]
-            }
+      },
+      {
+        "name": "Create Card",
+        "request": {
+          "method": "POST",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"customer_id\": \"CUST-001\",\n  \"card_type\": \"DEBIT\",\n  \"card_brand\": \"VISA\",\n  \"cardholder_name\": \"John Smith\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3001/tools/cms_create_card/execute",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3001",
+            "path": ["tools", "cms_create_card", "execute"]
           }
         }
-      ]
-    },
+      },
+      {
+        "name": "Update Card",
+        "request": {
+          "method": "POST",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"cardholder_name\": \"John A. Smith\",\n  \"credit_limit\": 15000\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3001/tools/cms_update_card/execute",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3001",
+            "path": ["tools", "cms_update_card", "execute"]
+          }
+        }
+      },
+      {
+        "name": "Delete Card",
+        "request": {
+          "method": "POST",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"card_id\": \"CARD-050\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3001/tools/cms_delete_card/execute",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3001",
+            "path": ["tools", "cms_delete_card", "execute"]
+          }
+        }
+      },
+      {
+        "name": "Update Card Controls",
+        "request": {
+          "method": "POST",
+          "header": [{"key": "Content-Type", "value": "application/json"}],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"international_enabled\": false,\n  \"online_enabled\": true,\n  \"daily_limit\": 500\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3001/tools/cms_update_card_controls/execute",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3001",
+            "path": ["tools", "cms_update_card_controls", "execute"]
+          }
+        }
+      }
+    ]
+  },
     {
       "name": "Transactions",
       "item": [
@@ -234,7 +324,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"limit\": 10\n}"
+              "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"limit\": 10\n}"
             },
             "url": {
               "raw": "http://localhost:3001/tools/cms_get_transactions/execute",
@@ -252,7 +342,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"transaction_id\": \"TXN-001\"\n}"
+              "raw": "{\n  \"transaction_id\": \"TXN-0001\"\n}"
             },
             "url": {
               "raw": "http://localhost:3001/tools/cms_get_transaction/execute",
@@ -270,7 +360,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"card_id\": \"CRD-0001\",\n  \"query\": \"Starbucks\",\n  \"min_amount\": 5,\n  \"max_amount\": 50\n}"
+              "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"query\": \"Starbucks\",\n  \"min_amount\": 5,\n  \"max_amount\": 50\n}"
             },
             "url": {
               "raw": "http://localhost:3001/tools/cms_search_transactions/execute",
@@ -278,6 +368,83 @@
               "host": ["localhost"],
               "port": "3001",
               "path": ["tools", "cms_search_transactions", "execute"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "item": [
+        {
+          "name": "Get Alerts",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"CUST-001\",\n  \"unread_only\": false,\n  \"limit\": 20\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_alerts/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_alerts", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Mark Alert Read",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alert_id\": \"ALERT-001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_mark_alert_read/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_mark_alert_read", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Get Alert Preferences",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"CUST-001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_alert_preferences/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_alert_preferences", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Update Alert Preferences",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"CUST-001\",\n  \"email_enabled\": true,\n  \"sms_enabled\": false,\n  \"push_enabled\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_update_alert_preferences/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_update_alert_preferences", "execute"]
             }
           }
         }
@@ -293,7 +460,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"transaction_id\": \"TXN-001\",\n  \"dispute_type\": \"unauthorized\",\n  \"reason\": \"I did not authorize this transaction\",\n  \"evidence_description\": \"Card was in my possession\"\n}"
+              "raw": "{\n  \"transaction_id\": \"TXN-0001\",\n  \"dispute_type\": \"unauthorized\",\n  \"reason\": \"I did not authorize this transaction\",\n  \"evidence_description\": \"Card was in my possession\"\n}"
             },
             "url": {
               "raw": "http://localhost:3001/tools/cms_create_dispute/execute",
@@ -319,6 +486,119 @@
               "host": ["localhost"],
               "port": "3001",
               "path": ["tools", "cms_get_disputes", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Get Dispute by ID",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dispute_id\": \"DISPUTE-001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_get_dispute/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_get_dispute", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Update Dispute",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dispute_id\": \"DISPUTE-001\",\n  \"additional_info\": \"Additional evidence: receipt showing different merchant\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_update_dispute/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_update_dispute", "execute"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Card Services",
+      "item": [
+        {
+          "name": "View PIN",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"password\": \"customer_password\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_view_pin/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_view_pin", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Change PIN",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"current_pin\": \"1234\",\n  \"new_pin\": \"5678\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_change_pin/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_change_pin", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Request Replacement Card",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"reason\": \"lost\",\n  \"expedited\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_request_replacement/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_request_replacement", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Activate Card",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": \"CARD-001\",\n  \"last_four_ssn\": \"1234\",\n  \"cvv\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/tools/cms_activate_card/execute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["tools", "cms_activate_card", "execute"]
             }
           }
         }
